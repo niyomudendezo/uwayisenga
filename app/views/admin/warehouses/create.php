@@ -36,18 +36,6 @@
           <input type="text" name="location" class="form-control" placeholder="e.g. Gasabo, Kigali">
         </div>
         <div class="col-md-6">
-          <label class="form-label">Capacity</label>
-          <input type="number" name="capacity" class="form-control" min="0" step="0.01">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Unit</label>
-          <select name="capacity_unit" class="form-select">
-            <option value="kg">kg</option>
-            <option value="ton">ton</option>
-            <option value="bags">bags</option>
-          </select>
-        </div>
-        <div class="col-md-6">
           <label class="form-label">Status</label>
           <select name="status" class="form-select">
             <option value="active">Active</option>
