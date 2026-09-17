@@ -40,18 +40,6 @@
           <input type="text" name="location" class="form-control" value="<?= Helper::e($warehouse['location'] ?? '') ?>">
         </div>
         <div class="col-md-6">
-          <label class="form-label">Capacity</label>
-          <input type="number" name="capacity" class="form-control" min="0" step="0.01" value="<?= $warehouse['capacity'] ?>">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Unit</label>
-          <select name="capacity_unit" class="form-select">
-            <?php foreach (['kg','ton','bags'] as $u): ?>
-              <option value="<?= $u ?>" <?= $warehouse['capacity_unit']===$u ? 'selected':'' ?>><?= $u ?></option>
-            <?php endforeach; ?>
-          </select>
-        </div>
-        <div class="col-md-6">
           <label class="form-label">Status</label>
           <select name="status" class="form-select">
             <option value="active"   <?= $warehouse['status']==='active'   ? 'selected':'' ?>>Active</option>
