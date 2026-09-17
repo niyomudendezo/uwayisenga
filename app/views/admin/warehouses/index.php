@@ -1,7 +1,7 @@
 <?php $title = 'Warehouses'; ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h4 class="mb-0"><i class="bi bi-building-fill me-2"></i>Warehouses</h4>
-  <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
+  <button class="btn btn-success btn-sm" onclick="new bootstrap.Modal(document.getElementById('createModal')).show()">
     <i class="bi bi-plus-lg"></i> Add Warehouse
   </button>
 </div>
