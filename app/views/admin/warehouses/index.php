@@ -71,15 +71,13 @@
           <th>Cooperative</th>
           <th>District</th>
           <th>Location</th>
-          <th>Capacity</th>
-          <th>Stock (kg)</th>
           <th>Status</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         <?php if (!$warehouses): ?>
-          <tr><td colspan="9" class="text-center text-muted py-4">No warehouses found. <a href="<?= APP_URL ?>/admin/warehouses/create">Add one</a>.</td></tr>
+          <tr><td colspan="7" class="text-center text-muted py-4">No warehouses found. <a href="<?= APP_URL ?>/admin/warehouses/create">Add one</a>.</td></tr>
         <?php endif; ?>
         <?php foreach ($warehouses as $i => $w): ?>
           <tr>
@@ -88,8 +86,6 @@
             <td><?= Helper::e($w['cooperative_name'] ?? '—') ?></td>
             <td><?= Helper::e($w['district_name'] ?? '—') ?></td>
             <td class="text-muted small"><?= Helper::e($w['location'] ?? '—') ?></td>
-            <td><?= $w['capacity'] ? number_format($w['capacity']) . ' ' . $w['capacity_unit'] : '—' ?></td>
-            <td><?= number_format($w['stock_qty']) ?> kg</td>
             <td>
               <span class="badge bg-<?= $w['status']==='active' ? 'success' : 'secondary' ?>">
                 <?= ucfirst($w['status']) ?>
