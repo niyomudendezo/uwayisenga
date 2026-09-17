@@ -100,7 +100,7 @@
               <a href="<?= APP_URL ?>/admin/warehouses/<?= $w['id'] ?>/edit" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
               <form method="POST" action="<?= APP_URL ?>/admin/warehouses/<?= $w['id'] ?>/delete" class="d-inline"
                     onsubmit="return confirm('Delete this warehouse?')">
-                <?= Helper::csrfField() ?>
+                <?= Auth::csrfField() ?>
                 <button class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
               </form>
             </td>

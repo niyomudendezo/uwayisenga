@@ -7,7 +7,7 @@
 <div class="card border-0 shadow-sm" style="max-width:600px">
   <div class="card-body">
     <form method="POST" action="<?= APP_URL ?>/admin/warehouses/store">
-      <?= Helper::csrfField() ?>
+      <?= Auth::csrfField() ?>
       <div class="row g-3">
         <div class="col-12">
           <label class="form-label">Name <span class="text-danger">*</span></label>
