@@ -52,6 +52,7 @@ $router->get('/admin/settings',      'AdminController',       'settings');
 $router->post('/admin/settings',     'AdminController',       'saveSettings');
 $router->get('/admin/inventory',     'AdminController',       'inventory');
 $router->get('/admin/warehouses',              'AdminController', 'warehouses');
+$router->get('/admin/warehouses/create',       'AdminController', 'createWarehouse');
 $router->post('/admin/warehouses/store',       'AdminController', 'storeWarehouse');
 $router->get('/admin/warehouses/{id}',         'AdminController', 'warehouseDetail');
 $router->get('/admin/warehouses/{id}/edit',    'AdminController', 'editWarehouse');

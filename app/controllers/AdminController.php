@@ -566,6 +566,14 @@ class AdminController extends Controller {
         ]);
     }
 
+    public function createWarehouse(): void {
+        $this->view('admin/warehouses/create', [
+            'title'        => 'Add Warehouse',
+            'cooperatives' => Database::getInstance()->query("SELECT id,name FROM cooperatives WHERE status='active' ORDER BY name")->fetchAll(),
+            'districts'    => Database::getInstance()->query("SELECT id,name FROM districts ORDER BY name")->fetchAll(),
+        ]);
+    }
+
     public function storeWarehouse(): void {
         if (!$this->isPost()) { $this->redirect('/admin/warehouses'); return; }
         $this->validateCsrf();
