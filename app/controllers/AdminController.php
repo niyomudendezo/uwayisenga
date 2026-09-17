@@ -549,4 +549,70 @@ class AdminController extends Controller {
         $this->flash('success', 'Prediction generated successfully.');
         $this->redirect('/admin/ai-predictions');
     }
+
+    // ── WAREHOUSES ────────────────────────────────────────────────────────────
+    public function warehouses(): void {
+        $model  = new WarehouseModel();
+        $search = $_GET['search'] ?? '';
+        $status = $_GET['status'] ?? '';
+        $this->view('admin/warehouses/index', [
+            'title'        => 'Warehouses',
+            'warehouses'   => $model->getAllWithDetails($search, $status),
+            'stats'        => $model->getStats(),
+            'search'       => $search,
+            'status'       => $status,
+            'cooperatives' => Database::getInstance()->query("SELECT id,name FROM cooperatives WHERE status='active' ORDER BY name")->fetchAll(),
+            'districts'    => Database::getInstance()->query("SELECT id,name FROM districts ORDER BY name")->fetchAll(),
+        ]);
+    }
+
+    public function storeWarehouse(): void {
+        if (!$this->isPost()) { $this->redirect('/admin/warehouses'); return; }
+        $this->validateCsrf();
+        (new WarehouseModel())->create($_POST);
+        AuditLogger::log('warehouse_created', 'warehouse', null, [], $_POST);
+        $this->flash('success', 'Warehouse created successfully.');
+        $this->redirect('/admin/warehouses');
+    }
+
+    public function editWarehouse(string $id): void {
+        $model = new WarehouseModel();
+        $warehouse = $model->getById((int)$id);
+        if (!$warehouse) { $this->redirect('/admin/warehouses'); return; }
+        $this->view('admin/warehouses/edit', [
+            'title'        => 'Edit Warehouse',
+            'warehouse'    => $warehouse,
+            'cooperatives' => Database::getInstance()->query("SELECT id,name FROM cooperatives WHERE status='active' ORDER BY name")->fetchAll(),
+            'districts'    => Database::getInstance()->query("SELECT id,name FROM districts ORDER BY name")->fetchAll(),
+        ]);
+    }
+
+    public function updateWarehouse(string $id): void {
+        if (!$this->isPost()) { $this->redirect('/admin/warehouses'); return; }
+        $this->validateCsrf();
+        (new WarehouseModel())->update((int)$id, $_POST);
+        AuditLogger::log('warehouse_updated', 'warehouse', (int)$id, [], $_POST);
+        $this->flash('success', 'Warehouse updated successfully.');
+        $this->redirect('/admin/warehouses');
+    }
+
+    public function deleteWarehouse(string $id): void {
+        if (!$this->isPost()) { $this->redirect('/admin/warehouses'); return; }
+        $this->validateCsrf();
+        (new WarehouseModel())->delete((int)$id);
+        AuditLogger::log('warehouse_deleted', 'warehouse', (int)$id);
+        $this->flash('success', 'Warehouse deleted.');
+        $this->redirect('/admin/warehouses');
+    }
+
+    public function warehouseDetail(string $id): void {
+        $model = new WarehouseModel();
+        $warehouse = $model->getById((int)$id);
+        if (!$warehouse) { $this->redirect('/admin/warehouses'); return; }
+        $this->view('admin/warehouses/detail', [
+            'title'     => $warehouse['name'],
+            'warehouse' => $warehouse,
+            'inventory' => $model->getInventory((int)$id),
+        ]);
+    }
 }

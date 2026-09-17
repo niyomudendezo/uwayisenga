@@ -51,6 +51,12 @@ $router->get('/admin/audit-logs',    'AdminController',       'auditLogs');
 $router->get('/admin/settings',      'AdminController',       'settings');
 $router->post('/admin/settings',     'AdminController',       'saveSettings');
 $router->get('/admin/inventory',     'AdminController',       'inventory');
+$router->get('/admin/warehouses',              'AdminController', 'warehouses');
+$router->post('/admin/warehouses/store',       'AdminController', 'storeWarehouse');
+$router->get('/admin/warehouses/{id}',         'AdminController', 'warehouseDetail');
+$router->get('/admin/warehouses/{id}/edit',    'AdminController', 'editWarehouse');
+$router->post('/admin/warehouses/{id}/update', 'AdminController', 'updateWarehouse');
+$router->post('/admin/warehouses/{id}/delete', 'AdminController', 'deleteWarehouse');
 $router->get('/admin/ai-predictions','AdminController',       'aiPredictions');
 $router->post('/admin/ai-predictions/run','AdminController',  'runPrediction');
 

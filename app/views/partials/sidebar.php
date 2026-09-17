@@ -33,6 +33,7 @@
         ['/admin/buyers','bi-shop','Buyers'],
         ['/admin/crops','bi-flower1','Crops'],
         ['/admin/inventory','bi-boxes','Inventory'],
+        ['/admin/warehouses','bi-building-fill','Warehouses'],
         ['/admin/market-prices','bi-graph-up','Market Prices'],
         ['/admin/orders','bi-cart3','Orders'],
         ['/admin/ai-predictions','bi-robot','AI Predictions'],
