@@ -18,25 +18,6 @@
       </div>
     </div>
     <div class="col-md-6">
-      <div class="card border-0 shadow-sm rounded-3 mb-3">
-        <div class="card-header bg-white border-0 fw-semibold">AI Settings</div>
-        <div class="card-body">
-          <div class="mb-3"><label class="form-label fw-semibold small">AI Service URL</label><input type="text" name="ai_service_url" class="form-control" value="<?= Helper::e($settings['ai_service_url'] ?? 'http://localhost:8000') ?>"></div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold small">AI Enabled</label>
-            <select name="ai_enabled" class="form-select">
-              <option value="0" <?= ($settings['ai_enabled'] ?? '0') == '0' ? 'selected' : '' ?>>Disabled (Use Local Engine)</option>
-              <option value="1" <?= ($settings['ai_enabled'] ?? '0') == '1' ? 'selected' : '' ?>>Enabled (Use External API)</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <div class="card border-0 shadow-sm rounded-3">
-        <div class="card-header bg-white border-0 fw-semibold">Inventory Settings</div>
-        <div class="card-body">
-          <div class="mb-3"><label class="form-label fw-semibold small">Low Stock Threshold (kg)</label><input type="number" name="low_stock_threshold" class="form-control" value="<?= Helper::e($settings['low_stock_threshold'] ?? '100') ?>"></div>
-        </div>
-      </div>
     </div>
   </div>
   <div class="mt-3">
