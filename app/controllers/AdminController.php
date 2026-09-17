@@ -577,8 +577,8 @@ class AdminController extends Controller {
     public function storeWarehouse(): void {
         if (!$this->isPost()) { $this->redirect('/admin/warehouses'); return; }
         $this->validateCsrf();
-        (new WarehouseModel())->create($_POST);
-        AuditLogger::log('warehouse_created', 'warehouse', null, [], $_POST);
+        $id = (new WarehouseModel())->create($_POST);
+        AuditLogger::log('warehouse_created', 'warehouse', $id, [], $_POST);
         $this->flash('success', 'Warehouse created successfully.');
         $this->redirect('/admin/warehouses');
     }

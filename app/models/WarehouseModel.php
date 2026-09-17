@@ -64,9 +64,9 @@ class WarehouseModel extends Model {
         )->execute([
             $data['cooperative_id'] ?: null,
             $data['name'],
-            $data['location'],
+            $data['location'] ?? '',
             $data['district_id'] ?: null,
-            $data['capacity'] ?: null,
+            $data['capacity'] ?? null,
             $data['capacity_unit'] ?? 'kg',
             $data['status'] ?? 'active',
         ]);
