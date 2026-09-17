@@ -47,8 +47,8 @@
           </select>
         </div>
         <div class="col-md-4">
-          <label class="form-label">Available Quantity (kg) <span class="text-danger">*</span></label>
-          <input type="number" name="qty_available" class="form-control" min="0.1" step="0.1" required>
+          <label class="form-label">Opening Stock (kg) <span class="text-danger">*</span></label>
+          <input type="number" name="qty_opening" class="form-control" min="0.1" step="0.1" required>
         </div>
         <div class="col-md-4">
           <label class="form-label">Buying Price (RWF/kg)</label>

@@ -45,7 +45,31 @@ class ApiController extends Controller {
     public function priceChart(string $cropId): void {
         $months     = (int) ($_GET['months'] ?? 12);
         $districtId = (int) ($_GET['district'] ?? 0);
-        $history    = (new MarketPriceModel())->getPriceHistory((int)$cropId, $districtId, $months);
+        $model      = new MarketPriceModel();
+        if ((int)$cropId === 0) {
+            $history = $model->getAllCropPriceHistory($districtId, $months);
+            $labels = array_values(array_unique(array_column($history, 'price_date')));
+            $series = [];
+            foreach ($history as $row) {
+                $series[$row['crop_id']]['label'] = $row['crop_name'];
+                $series[$row['crop_id']]['unit'] = $row['unit'];
+                $series[$row['crop_id']]['values'][$row['price_date']] = (float)$row['price'];
+            }
+            $datasets = [];
+            foreach ($series as $cropSeries) {
+                $datasets[] = [
+                    'label' => $cropSeries['label'],
+                    'unit' => $cropSeries['unit'],
+                    'data' => array_map(
+                        static fn($date) => $cropSeries['values'][$date] ?? null,
+                        $labels
+                    ),
+                ];
+            }
+            $this->json(['labels' => $labels, 'datasets' => $datasets]);
+            return;
+        }
+        $history = $model->getPriceHistory((int)$cropId, $districtId, $months);
         $this->json([
             'labels' => array_column($history, 'price_date'),
             'prices' => array_column($history, 'price'),

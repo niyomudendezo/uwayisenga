@@ -71,7 +71,7 @@ class AIPredictionService {
         $result = [
             'crop_id'             => $cropId,
             'crop_name'           => $cropName,
-            'district_id'         => $districtId,
+            'district_id'         => $districtId ?: null,
             'cooperative_id'      => $cooperativeId ?: null,
             'predicted_demand'    => $demand,
             'predicted_price'     => round($predictedPrice, 2),
@@ -82,7 +82,7 @@ class AIPredictionService {
             'confidence_score'    => $confidence,
             'suggested_qty'       => round($suggestedQty, 2),
             'recommendation_text' => $recommendation,
-            'model_version'       => '1.0',
+            'model_version'       => '1.1',
             'prediction_date'     => date('Y-m-d'),
         ];
 
@@ -91,13 +91,71 @@ class AIPredictionService {
     }
 
     private function getHistoricalPrices(int $cropId, int $districtId): array {
-        $stmt = $this->db->prepare(
-            "SELECT price, price_date FROM market_prices
-             WHERE crop_id=? AND (district_id=? OR district_id IS NULL)
-             ORDER BY price_date DESC LIMIT 24"
-        );
-        $stmt->execute([$cropId, $districtId]);
-        return $stmt->fetchAll();
+        if ($districtId) {
+            $stmt = $this->db->prepare(
+                "SELECT AVG(price) AS price, price_date FROM market_prices
+                 WHERE crop_id=? AND (district_id=? OR district_id IS NULL)
+                 GROUP BY price_date ORDER BY price_date DESC LIMIT 24"
+            );
+            $stmt->execute([$cropId, $districtId]);
+        } else {
+            $stmt = $this->db->prepare(
+                "SELECT AVG(price) AS price, price_date FROM market_prices
+                 WHERE crop_id=?
+                 GROUP BY price_date ORDER BY price_date DESC LIMIT 24"
+            );
+            $stmt->execute([$cropId]);
+        }
+        $observations = $stmt->fetchAll();
+
+        $salesSql = "SELECT oi.unit_price AS price, DATE(o.created_at) AS price_date
+                     FROM order_items oi
+                     JOIN orders o ON o.id=oi.order_id
+                     JOIN cooperatives co ON co.id=o.cooperative_id
+                     WHERE oi.crop_id=? AND o.status='completed'";
+        $salesParams = [$cropId];
+        if ($districtId) {
+            $salesSql .= " AND co.district_id=?";
+            $salesParams[] = $districtId;
+        }
+        $salesSql .= " ORDER BY o.created_at DESC LIMIT 24";
+        $salesStmt = $this->db->prepare($salesSql);
+        $salesStmt->execute($salesParams);
+        $observations = array_merge($observations, $salesStmt->fetchAll());
+
+        $daily = [];
+        foreach ($observations as $observation) {
+            $daily[$observation['price_date']][] = (float)$observation['price'];
+        }
+        $combined = [];
+        foreach ($daily as $date => $values) {
+            $combined[] = ['price_date' => $date, 'price' => array_sum($values) / count($values)];
+        }
+        usort($combined, static fn($a, $b) => strcmp($b['price_date'], $a['price_date']));
+        return array_slice($combined, 0, 24);
+    }
+
+    public function getPredictionEvidence(int $cropId, int $districtId = 0): array {
+        $marketSql = "SELECT COUNT(*) FROM market_prices WHERE crop_id=?";
+        $marketParams = [$cropId];
+        if ($districtId) {
+            $marketSql .= " AND (district_id=? OR district_id IS NULL)";
+            $marketParams[] = $districtId;
+        }
+        $stmt = $this->db->prepare($marketSql);
+        $stmt->execute($marketParams);
+
+        $salesSql = "SELECT COUNT(*) FROM order_items oi JOIN orders o ON o.id=oi.order_id
+                     JOIN cooperatives co ON co.id=o.cooperative_id
+                     WHERE oi.crop_id=? AND o.status='completed'";
+        $salesParams = [$cropId];
+        if ($districtId) {
+            $salesSql .= " AND co.district_id=?";
+            $salesParams[] = $districtId;
+        }
+        $salesStmt = $this->db->prepare($salesSql);
+        $salesStmt->execute($salesParams);
+        return ['prices' => (int)$stmt->fetchColumn(), 'sales' => (int)$salesStmt->fetchColumn()];
     }
 
     private function getSalesHistory(int $cropId, int $cooperativeId): array {
@@ -193,8 +251,10 @@ class AIPredictionService {
     }
 
     private function calculateConfidence(int $priceCount, int $salesCount): float {
-        $base = min(100, ($priceCount * 3) + ($salesCount * 2));
-        return round(max(40, min(95, $base)), 1);
+        if ($priceCount === 0 && $salesCount === 0) return 0.0;
+        $priceCoverage = min(1, $priceCount / 24);
+        $salesCoverage = min(1, $salesCount / 20);
+        return round(min(95, ($priceCoverage * 70) + ($salesCoverage * 25)), 1);
     }
 
     private function getBestSellingPeriod(array $prices): string {
@@ -222,7 +282,6 @@ class AIPredictionService {
         $text = "Demand forecast: {$demand}. ";
         $text .= "Predicted price: " . number_format($predicted, 0) . " RWF/kg ";
         $text .= "(expected to {$direction} by " . abs(round($priceDiff, 0)) . " RWF). ";
-        $text .= "Best buyer: {$buyerName}. ";
         $text .= "Recommended action: {$period}.";
 
         return $text;
@@ -263,12 +322,15 @@ class AIPredictionService {
 
     public function getLatestPredictions(int $limit = 10): array {
         $stmt = $this->db->prepare(
-            "SELECT ap.*, c.name as crop_name, d.name as district_name,
-                    co.name as cooperative_name
+            "SELECT ap.*, c.name as crop_name, c.unit, d.name as district_name,
+                    co.name as cooperative_name,
+                    COALESCE(NULLIF(b.company_name, ''), CONCAT(u.first_name, ' ', u.last_name)) AS best_buyer_name
              FROM ai_predictions ap
              JOIN crops c ON ap.crop_id=c.id
              LEFT JOIN districts d ON ap.district_id=d.id
              LEFT JOIN cooperatives co ON ap.cooperative_id=co.id
+             LEFT JOIN buyers b ON ap.best_buyer_id=b.id
+             LEFT JOIN users u ON b.user_id=u.id
              ORDER BY ap.created_at DESC LIMIT ?"
         );
         $stmt->execute([$limit]);

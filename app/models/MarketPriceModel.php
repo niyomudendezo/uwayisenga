@@ -35,6 +35,28 @@ class MarketPriceModel extends Model {
         );
     }
 
+    public function getAllCropPriceHistory(int $districtId = 0, int $months = 12): array {
+        $params = [];
+        $districtWhere = '';
+        if ($districtId) {
+            $districtWhere = 'AND mp.district_id=?';
+            $params[] = $districtId;
+        }
+        $params[] = $months;
+        return $this->rawQuery(
+            "SELECT mp.price_date, c.id AS crop_id, c.name AS crop_name,
+                    c.unit, ROUND(AVG(mp.price), 2) AS price
+             FROM market_prices mp
+             JOIN crops c ON c.id=mp.crop_id
+             WHERE mp.price_date >= DATE_SUB(
+                 (SELECT MAX(price_date) FROM market_prices), INTERVAL ? MONTH
+             ) $districtWhere
+             GROUP BY mp.price_date, c.id, c.name, c.unit
+             ORDER BY mp.price_date ASC, c.name ASC",
+            $districtId ? [$months, $districtId] : [$months]
+        );
+    }
+
     public function getPriceTrends(int $cropId = 0): array {
         $cropWhere = $cropId ? "AND c.id=$cropId" : '';
         return $this->rawQuery(

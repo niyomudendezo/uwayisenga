@@ -39,13 +39,7 @@
 
       <div class="login-register">New to AgruKrwanda? <a href="<?= APP_URL ?>/register">Create a free account</a></div>
 
-      <details class="demo-access">
-        <summary><span><i class="bi bi-key"></i> Demo access</span><i class="bi bi-chevron-down"></i></summary>
-        <div class="demo-content">
-          <div><span>Administrator</span><code>admin@agrukrwanda.rw</code><small>Password: Admin@1234</small></div>
-          <div><span>Cooperative manager</span><code>manager@kigaligrains.rw</code><small>Password: Admin@1234</small></div>
-        </div>
-      </details>
+     
     </div>
     <p class="login-security-note"><i class="bi bi-lock-fill"></i> Your information is securely protected</p>
   </section>

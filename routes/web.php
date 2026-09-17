@@ -62,6 +62,8 @@ $router->get('/cooperative/inventory/create','CooperativeController','createInve
 $router->post('/cooperative/inventory/store','CooperativeController','storeInventory');
 $router->get('/cooperative/inventory/{id}/edit','CooperativeController','editInventory');
 $router->post('/cooperative/inventory/{id}/update','CooperativeController','updateInventory');
+$router->post('/cooperative/inventory/{id}/stock-in','CooperativeController','stockIn');
+$router->post('/cooperative/inventory/{id}/stock-out','CooperativeController','stockOut');
 $router->get('/cooperative/harvests',    'CooperativeController', 'harvests');
 $router->post('/cooperative/harvests/store','CooperativeController','storeHarvest');
 $router->get('/cooperative/orders',      'CooperativeController', 'orders');

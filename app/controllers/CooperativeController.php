@@ -45,8 +45,13 @@ class CooperativeController extends Controller {
         $page   = (int)($_GET['page'] ?? 1);
         $search = $_GET['search'] ?? '';
         $cropId = (int)($_GET['crop'] ?? 0);
-        $result = $model->getAllWithDetails($page, 15, $search, $this->coopId, $cropId);
-        $stats  = $model->getSummaryStats($this->coopId);
+        $dateFrom = $this->validDate($_GET['date_from'] ?? '');
+        $dateTo   = $this->validDate($_GET['date_to'] ?? '');
+        if ($dateFrom && $dateTo && $dateFrom > $dateTo) { [$dateFrom, $dateTo] = [$dateTo, $dateFrom]; }
+        $result = $model->getAllWithDetails($page, 15, $search, $this->coopId, $cropId, $dateFrom, $dateTo);
+        $stats  = ($dateFrom || $dateTo)
+            ? $model->getPeriodSummary($this->coopId, $cropId, $dateFrom, $dateTo)
+            : $model->getSummaryStats($this->coopId, $cropId);
         $db     = Database::getInstance();
         $this->view('cooperative/inventory/index', [
             'title'      => 'Inventory',
@@ -56,7 +61,14 @@ class CooperativeController extends Controller {
             'crops'      => (new CropModel())->getAllWithCategory(),
             'warehouses' => $db->query("SELECT * FROM warehouses WHERE cooperative_id={$this->coopId}")->fetchAll(),
             'cropId'     => $cropId,
+            'dateFrom'   => $dateFrom,
+            'dateTo'     => $dateTo,
         ]);
+    }
+
+    private function validDate(string $date): string {
+        $parsed = DateTime::createFromFormat('Y-m-d', $date);
+        return $parsed && $parsed->format('Y-m-d') === $date ? $date : '';
     }
 
     public function createInventory(): void {
@@ -86,7 +98,9 @@ class CooperativeController extends Controller {
             'warehouse_id'   => (int)($_POST['warehouse_id'] ?? 0) ?: null,
             'crop_id'        => (int)($_POST['crop_id'] ?? 0),
             'harvest_id'     => (int)($_POST['harvest_id'] ?? 0) ?: null,
-            'qty_available'  => (float)($_POST['qty_available'] ?? 0),
+            'qty_opening'    => (float)($_POST['qty_opening'] ?? $_POST['qty_available'] ?? 0),
+            'qty_received'   => 0,
+            'qty_available'  => (float)($_POST['qty_opening'] ?? $_POST['qty_available'] ?? 0),
             'grade'          => $_POST['grade'] ?? 'A',
             'buying_price'   => (float)($_POST['buying_price'] ?? 0),
             'asking_price'   => (float)($_POST['asking_price'] ?? 0),
@@ -94,8 +108,9 @@ class CooperativeController extends Controller {
             'expiry_date'    => $_POST['expiry_date'] ?? null,
             'status'         => 'available',
         ];
-        if (!$data['crop_id'] || !$data['qty_available']) { $this->flash('danger', 'Crop and quantity required.'); $this->redirect('/cooperative/inventory/create'); return; }
+        if (!$data['crop_id'] || !$data['qty_opening']) { $this->flash('danger', 'Crop and opening stock are required.'); $this->redirect('/cooperative/inventory/create'); return; }
         $id = (new InventoryModel())->create($data);
+        (new InventoryModel())->recordMovement($id, 'opening', $data['qty_opening'], 'inventory', $id, ($data['harvest_date'] ?: date('Y-m-d')) . ' 00:00:00');
         AuditLogger::log('inventory_created', 'inventory', $id, [], $data);
         NotificationService::sendToRole('buyer', 'new_stock', 'New Stock Available', 'New crop inventory has been added.', '/buyer/marketplace');
         $this->flash('success', 'Inventory added.');
@@ -122,7 +137,6 @@ class CooperativeController extends Controller {
         $item  = $model->find((int)$id);
         if (!$item || $item['cooperative_id'] != $this->coopId) { $this->flash('danger', 'Not found.'); $this->redirect('/cooperative/inventory'); return; }
         $data = [
-            'qty_available' => (float)($_POST['qty_available'] ?? 0),
             'asking_price'  => (float)($_POST['asking_price'] ?? 0),
             'buying_price'  => (float)($_POST['buying_price'] ?? 0),
             'grade'         => $_POST['grade'] ?? 'A',
@@ -132,6 +146,38 @@ class CooperativeController extends Controller {
         $model->update((int)$id, $data);
         AuditLogger::log('inventory_updated', 'inventory', (int)$id, $item, $data);
         $this->flash('success', 'Inventory updated.');
+        $this->redirect('/cooperative/inventory');
+    }
+
+    public function stockIn(string $id): void {
+        if (!$this->isPost()) { $this->redirect('/cooperative/inventory'); return; }
+        $this->validateCsrf();
+        $model = new InventoryModel();
+        $item = $model->find((int)$id);
+        $qty = (float)($_POST['quantity'] ?? 0);
+        if (!$item || (int)$item['cooperative_id'] !== $this->coopId || $qty <= 0) {
+            $this->flash('danger', 'Enter a valid stock-in quantity.');
+            $this->redirect('/cooperative/inventory'); return;
+        }
+        $model->stockIn((int)$id, $qty);
+        AuditLogger::log('inventory_stock_in', 'inventory', (int)$id, ['qty_available'=>$item['qty_available']], ['quantity'=>$qty]);
+        $this->flash('success', number_format($qty, 2) . ' units added to stock.');
+        $this->redirect('/cooperative/inventory');
+    }
+
+    public function stockOut(string $id): void {
+        if (!$this->isPost()) { $this->redirect('/cooperative/inventory'); return; }
+        $this->validateCsrf();
+        $model = new InventoryModel();
+        $item = $model->find((int)$id);
+        $qty = (float)($_POST['quantity'] ?? 0);
+        if (!$item || (int)$item['cooperative_id'] !== $this->coopId || $qty <= 0 || $qty > (float)$item['qty_available']) {
+            $this->flash('danger', 'Stock-out quantity must be greater than zero and cannot exceed available stock.');
+            $this->redirect('/cooperative/inventory'); return;
+        }
+        $model->stockOut((int)$id, $qty);
+        AuditLogger::log('inventory_stock_out', 'inventory', (int)$id, ['qty_available'=>$item['qty_available']], ['quantity'=>$qty]);
+        $this->flash('success', number_format($qty, 2) . ' units removed from stock.');
         $this->redirect('/cooperative/inventory');
     }
 

@@ -132,10 +132,14 @@ VALUES (1,1,1,1500,'A','2024-04-10','Season A 2024'),
        (1,10,1,600,'B','2024-04-20','Season A 2024');
 
 -- ─── SAMPLE INVENTORY ────────────────────────────────────────────────────────
-INSERT INTO inventories (cooperative_id, warehouse_id, crop_id, harvest_id, qty_available, grade, buying_price, asking_price, harvest_date)
-VALUES (1,1,1,1,1500,'A',550,620,'2024-04-10'),
-       (1,1,5,2,800,'A',420,490,'2024-04-15'),
-       (1,1,10,3,600,'B',360,410,'2024-04-20');
+INSERT INTO inventories (cooperative_id, warehouse_id, crop_id, harvest_id, qty_opening, qty_available, grade, buying_price, asking_price, harvest_date)
+VALUES (1,1,1,1,1500,1500,'A',550,620,'2024-04-10'),
+       (1,1,5,2,800,800,'A',420,490,'2024-04-15'),
+       (1,1,10,3,600,600,'B',360,410,'2024-04-20');
+
+INSERT INTO inventory_movements (inventory_id, movement_type, quantity, movement_date, reference_type, reference_id)
+SELECT id, 'opening', qty_opening, CONCAT(harvest_date, ' 00:00:00'), 'inventory', id
+FROM inventories WHERE qty_opening > 0;
 
 -- ─── SAMPLE AI PREDICTIONS ───────────────────────────────────────────────────
 INSERT INTO ai_predictions (crop_id, district_id, cooperative_id, predicted_demand, predicted_price, best_buyer_id, best_selling_period, estimated_revenue, confidence_score, suggested_qty, recommendation_text, prediction_date)

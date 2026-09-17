@@ -221,6 +221,8 @@ CREATE TABLE inventories (
     warehouse_id     INT UNSIGNED,
     crop_id          SMALLINT UNSIGNED NOT NULL,
     harvest_id       INT UNSIGNED,
+    qty_opening      DECIMAL(12,2) DEFAULT 0,
+    qty_received     DECIMAL(12,2) DEFAULT 0,
     qty_available    DECIMAL(12,2) DEFAULT 0,
     qty_reserved     DECIMAL(12,2) DEFAULT 0,
     qty_sold         DECIMAL(12,2) DEFAULT 0,
@@ -240,6 +242,20 @@ CREATE TABLE inventories (
     FOREIGN KEY (crop_id)        REFERENCES crops(id),
     FOREIGN KEY (harvest_id)     REFERENCES harvests(id) ON DELETE SET NULL,
     INDEX idx_coop_crop (cooperative_id, crop_id)
+);
+
+CREATE TABLE inventory_movements (
+    id             BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    inventory_id   INT UNSIGNED NOT NULL,
+    movement_type  ENUM('opening','in','out') NOT NULL,
+    quantity       DECIMAL(12,2) NOT NULL,
+    movement_date  DATETIME DEFAULT CURRENT_TIMESTAMP,
+    reference_type VARCHAR(50),
+    reference_id   INT UNSIGNED,
+    created_at     DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (inventory_id) REFERENCES inventories(id) ON DELETE CASCADE,
+    INDEX idx_inventory_movement_date (inventory_id, movement_date),
+    INDEX idx_movement_date (movement_date)
 );
 
 -- ─── MARKET PRICES ───────────────────────────────────────────────────────────

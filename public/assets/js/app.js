@@ -112,3 +112,41 @@ document.querySelectorAll('.datatable').forEach(table => {
     language: { search: 'Search:', lengthMenu: 'Show _MENU_ entries' }
   });
 });
+
+// ─── COOPERATIVE MEMBER SEARCH ──────────────────────────────────────────
+function initCooperativeMemberSearch() {
+  const searchInput = document.getElementById('coopMemberSearch');
+  const membersTable = document.getElementById('coopMembersTable');
+  if (!searchInput || !membersTable) return;
+
+  const memberRows = [...membersTable.querySelectorAll('tbody tr')]
+    .filter(row => !row.querySelector('.member-empty'));
+  const noResults = document.getElementById('memberNoResults');
+  const visibleCount = document.getElementById('memberVisibleCount');
+  const countLabel = document.getElementById('memberCountLabel');
+
+  const filterMembers = () => {
+    const query = searchInput.value.trim().toLocaleLowerCase();
+    let matches = 0;
+
+    memberRows.forEach(row => {
+      const searchableText = row.innerText.toLocaleLowerCase();
+      const isMatch = query === '' || searchableText.includes(query);
+      row.style.display = isMatch ? '' : 'none';
+      row.setAttribute('aria-hidden', isMatch ? 'false' : 'true');
+      if (isMatch) matches++;
+    });
+
+    if (visibleCount) visibleCount.textContent = matches;
+    if (countLabel) countLabel.textContent = matches === 1 ? 'member' : 'members';
+    noResults?.classList.toggle('show', memberRows.length > 0 && matches === 0);
+    membersTable.style.display = memberRows.length > 0 && matches === 0 ? 'none' : '';
+  };
+
+  searchInput.addEventListener('input', filterMembers);
+  searchInput.addEventListener('search', filterMembers);
+  searchInput.addEventListener('keyup', filterMembers);
+  filterMembers();
+}
+
+initCooperativeMemberSearch();

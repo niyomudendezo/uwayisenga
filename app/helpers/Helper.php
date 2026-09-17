@@ -62,17 +62,19 @@ class Helper {
 
         if ($last <= 1) return '';
 
+        $separator = str_contains($baseUrl, '?') ? '&' : '?';
+
         $html = '<nav><ul class="pagination pagination-sm mb-0">';
         $html .= '<li class="page-item' . ($current <= 1 ? ' disabled' : '') . '">';
-        $html .= '<a class="page-link" href="' . $baseUrl . '?page=' . ($current - 1) . '">«</a></li>';
+        $html .= '<a class="page-link" href="' . $baseUrl . $separator . 'page=' . ($current - 1) . '">«</a></li>';
 
         for ($i = max(1, $current - 2); $i <= min($last, $current + 2); $i++) {
             $html .= '<li class="page-item' . ($i === $current ? ' active' : '') . '">';
-            $html .= '<a class="page-link" href="' . $baseUrl . '?page=' . $i . '">' . $i . '</a></li>';
+            $html .= '<a class="page-link" href="' . $baseUrl . $separator . 'page=' . $i . '">' . $i . '</a></li>';
         }
 
         $html .= '<li class="page-item' . ($current >= $last ? ' disabled' : '') . '">';
-        $html .= '<a class="page-link" href="' . $baseUrl . '?page=' . ($current + 1) . '">»</a></li>';
+        $html .= '<a class="page-link" href="' . $baseUrl . $separator . 'page=' . ($current + 1) . '">»</a></li>';
         $html .= '</ul></nav>';
         return $html;
     }

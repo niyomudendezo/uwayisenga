@@ -30,7 +30,8 @@
         </div>
         <div class="col-md-4">
           <label class="form-label">Available Quantity (kg)</label>
-          <input type="number" name="qty_available" class="form-control" min="0" step="0.1" value="<?= $item['qty_available'] ?>">
+          <input type="number" class="form-control bg-light" value="<?= $item['qty_available'] ?>" readonly>
+          <small class="text-muted">Use Stock In or Stock Out from the inventory page to change this balance.</small>
         </div>
         <div class="col-md-4">
           <label class="form-label">Buying Price (RWF/kg)</label>

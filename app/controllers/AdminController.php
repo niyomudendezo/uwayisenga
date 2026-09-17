@@ -143,12 +143,20 @@ class AdminController extends Controller {
         $search = $_GET['search'] ?? '';
         $result = $model->getAllWithDetails($page, 15, $search);
         $db     = Database::getInstance();
+        $cooperativeStats = $db->query(
+            "SELECT COUNT(*) AS total,
+                    SUM(status='active') AS active,
+                    SUM(manager_id IS NULL) AS unassigned,
+                    (SELECT COUNT(*) FROM farmers WHERE cooperative_id IS NOT NULL) AS members
+             FROM cooperatives"
+        )->fetch();
         $this->view('admin/cooperatives/index', [
             'title'     => 'Cooperatives',
             'result'    => $result,
             'search'    => $search,
             'districts' => $db->query("SELECT * FROM districts ORDER BY name")->fetchAll(),
             'managers'  => $db->query("SELECT u.id, u.first_name, u.last_name FROM users u JOIN roles r ON u.role_id=r.id WHERE r.name='cooperative_manager' AND u.status='active'")->fetchAll(),
+            'stats'     => $cooperativeStats,
         ]);
     }
 
@@ -288,6 +296,9 @@ class AdminController extends Controller {
         $distId = (int)($_GET['district'] ?? 0);
         $result = $model->getAllPaginated($page, 15, $cropId, $distId);
         $db     = Database::getInstance();
+        $defaultChartCropId = $cropId ?: (int) $db->query(
+            "SELECT crop_id FROM market_prices ORDER BY price_date DESC, id DESC LIMIT 1"
+        )->fetchColumn();
         $this->view('admin/market-prices/index', [
             'title'     => 'Market Prices',
             'result'    => $result,
@@ -296,6 +307,7 @@ class AdminController extends Controller {
             'trends'    => $model->getPriceTrends(),
             'cropId'    => $cropId,
             'distId'    => $distId,
+            'defaultChartCropId' => $defaultChartCropId,
         ]);
     }
 
@@ -504,12 +516,18 @@ class AdminController extends Controller {
     public function aiPredictions(): void {
         $aiService = new AIPredictionService();
         $db        = Database::getInstance();
+        $crops     = (new CropModel())->getAllWithCategory();
+        $predictionEvidence = [];
+        foreach ($crops as $crop) {
+            $predictionEvidence[$crop['id']] = $aiService->getPredictionEvidence((int)$crop['id']);
+        }
         $this->view('admin/ai-predictions', [
             'title'       => 'AI Predictions',
             'predictions' => $aiService->getLatestPredictions(20),
             'summary'     => $aiService->getPredictionSummary(),
-            'crops'       => (new CropModel())->getAllWithCategory(),
+            'crops'       => $crops,
             'districts'   => $db->query("SELECT * FROM districts ORDER BY name")->fetchAll(),
+            'predictionEvidence' => $predictionEvidence,
         ]);
     }
 
@@ -517,9 +535,16 @@ class AdminController extends Controller {
         if (!$this->isPost()) { $this->redirect('/admin/ai-predictions'); return; }
         $this->validateCsrf();
         $cropId     = (int)($_POST['crop_id'] ?? 0);
-        $districtId = (int)($_POST['district_id'] ?? 1);
-        if (!$cropId) { $this->flash('danger', 'Select a crop.'); $this->redirect('/admin/ai-predictions'); return; }
-        $result = (new AIPredictionService())->predict($cropId, $districtId);
+        $districtId = (int)($_POST['district_id'] ?? 0);
+        if (!$cropId || !array_key_exists('district_id', $_POST)) { $this->flash('danger', 'Select a crop and market area.'); $this->redirect('/admin/ai-predictions'); return; }
+        $service = new AIPredictionService();
+        $evidence = $service->getPredictionEvidence($cropId, $districtId);
+        if (($evidence['prices'] + $evidence['sales']) === 0) {
+            $this->flash('danger', 'Prediction unavailable: this crop has no market-price or completed-sale evidence for the selected area. Add verified market data first.');
+            $this->redirect('/admin/ai-predictions');
+            return;
+        }
+        $result = $service->predict($cropId, $districtId);
         AuditLogger::log('ai_prediction_run', 'ai', $cropId, [], $result);
         $this->flash('success', 'Prediction generated successfully.');
         $this->redirect('/admin/ai-predictions');

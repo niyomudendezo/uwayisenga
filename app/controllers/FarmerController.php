@@ -21,9 +21,6 @@ class FarmerController extends Controller {
         $aiService = new AIPredictionService();
         $predictions = $aiService->getLatestPredictions(3);
 
-        $db = Database::getInstance();
-        $salesTotal = (float) $db->prepare("SELECT COALESCE(SUM(oi.total_price),0) FROM order_items oi JOIN orders o ON oi.order_id=o.id JOIN harvests h ON oi.inventory_id IN (SELECT id FROM inventories WHERE harvest_id IN (SELECT id FROM harvests WHERE farmer_id=?)) WHERE o.status='completed'")->execute([$farmerId]) ? 0 : 0;
-
         $this->view('farmer/dashboard', [
             'farmer'      => $this->farmer,
             'harvests'    => array_slice($harvests, 0, 5),
@@ -72,11 +69,19 @@ class FarmerController extends Controller {
         $model  = new HarvestModel();
         $page   = (int)($_GET['page'] ?? 1);
         $result = $model->getAllWithDetails($page, 15, '', $this->farmer['id']);
+        $db = Database::getInstance();
+        $statsStmt = $db->prepare(
+            "SELECT COUNT(*) AS records, COALESCE(SUM(quantity),0) AS total_qty,
+                    COUNT(DISTINCT crop_id) AS crop_count, MAX(harvest_date) AS latest_date
+             FROM harvests WHERE farmer_id=?"
+        );
+        $statsStmt->execute([$this->farmer['id']]);
         $this->view('farmer/harvests', [
             'title'  => 'My Harvests',
             'result' => $result,
             'crops'  => (new CropModel())->getAllWithCategory(),
             'farmer' => $this->farmer,
+            'stats'   => $statsStmt->fetch(),
         ]);
     }
 
@@ -122,7 +127,15 @@ class FarmerController extends Controller {
             $stmt->execute([$crop['name']]);
             $cropRow = $stmt->fetch();
             if ($cropRow) {
-                $predictions[] = $aiService->predict($cropRow['id'], $this->farmer['district_id'] ?? 1, $this->farmer['cooperative_id'] ?? 0);
+                $districtId = (int)($this->farmer['district_id'] ?? 0);
+                $evidence = $aiService->getPredictionEvidence((int)$cropRow['id'], $districtId);
+                if (($evidence['prices'] + $evidence['sales']) === 0 && $districtId) {
+                    $districtId = 0;
+                    $evidence = $aiService->getPredictionEvidence((int)$cropRow['id'], 0);
+                }
+                if (($evidence['prices'] + $evidence['sales']) > 0) {
+                    $predictions[] = $aiService->predict((int)$cropRow['id'], $districtId, $this->farmer['cooperative_id'] ?? 0);
+                }
             }
         }
 

@@ -1,17 +1,17 @@
 <?php $title = 'About Us'; ?>
 
-<section class="py-5 bg-success text-white text-center">
+<div class="public-info-page"><section class="public-info-hero">
   <div class="container">
-    <h1 class="fw-bold mb-2">About <?= APP_NAME ?></h1>
-    <p class="lead opacity-90 mb-0">Transforming Rwanda's agricultural market through technology</p>
+    <span>Our story</span><h1>About <?= APP_NAME ?></h1>
+    <p>Transforming Rwanda's agricultural market through technology</p>
   </div>
 </section>
 
-<section class="py-5">
+<section class="public-info-content">
   <div class="container">
     <div class="row g-5 align-items-center mb-5">
       <div class="col-md-6">
-        <h2 class="fw-bold mb-3">Our Mission</h2>
+        <span class="section-eyebrow">Purpose and impact</span><h2 class="fw-bold mb-3">Our mission</h2>
         <p class="text-muted">
           <?= APP_NAME ?> is an AI-powered agricultural market linkage platform designed to connect Rwanda's farmers, cooperatives, and buyers. We eliminate middlemen, provide real-time market prices, and use artificial intelligence to forecast demand and optimize trade.
         </p>
@@ -29,7 +29,7 @@
           ]; ?>
           <?php foreach ($values as [$icon, $title, $desc]): ?>
           <div class="col-6">
-            <div class="card border-0 shadow-sm rounded-3 p-3 h-100">
+            <div class="card public-value-card p-3 h-100">
               <i class="bi <?= $icon ?> text-success fs-2 mb-2"></i>
               <div class="fw-bold"><?= $title ?></div>
               <div class="small text-muted"><?= $desc ?></div>
@@ -49,4 +49,4 @@
       </a>
     </div>
   </div>
-</section>
+</section></div>
