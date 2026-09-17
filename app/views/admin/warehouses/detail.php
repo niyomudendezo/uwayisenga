@@ -1,5 +1,4 @@
-<?php $this->layout('layouts/main', ['title' => $title]) ?>
-
+<?php $title = $warehouse['name']; ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h4 class="mb-0"><i class="bi bi-building-fill me-2"></i><?= Helper::e($warehouse['name']) ?></h4>
   <div>

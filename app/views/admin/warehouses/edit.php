@@ -1,5 +1,4 @@
-<?php $this->layout('layouts/main', ['title' => $title]) ?>
-
+<?php $title = 'Edit Warehouse'; ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h4 class="mb-0"><i class="bi bi-pencil me-2"></i>Edit Warehouse</h4>
   <a href="<?= APP_URL ?>/admin/warehouses" class="btn btn-outline-secondary btn-sm">Back</a>
