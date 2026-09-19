@@ -17,7 +17,7 @@ ini_set('display_errors', 1);
 
 date_default_timezone_set('Africa/Kigali');
 
-spl_autoload_register(function (string $class): void {
+spl_autoload_register(function ($class) {
     $paths = [
         BASE_PATH . '/app/models/',
         BASE_PATH . '/app/controllers/',

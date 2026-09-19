@@ -6,9 +6,9 @@ define('DB_PASS', '');
 define('DB_CHARSET', 'utf8mb4');
 
 class Database {
-    private static ?PDO $instance = null;
+    private static $instance = null;
 
-    public static function getInstance(): PDO {
+    public static function getInstance() {
         if (self::$instance === null) {
             $socket = '/opt/lampp/var/mysql/mysql.sock';
             $dsn = file_exists($socket)
