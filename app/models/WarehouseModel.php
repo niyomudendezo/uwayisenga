@@ -22,7 +22,7 @@ class WarehouseModel extends Model {
         return $stmt->fetchAll();
     }
 
-    public function getById($id): ?array {
+    public function getById($id) {
         $stmt = $this->db->prepare(
             "SELECT w.*, co.name as cooperative_name, d.name as district_name
              FROM warehouses w

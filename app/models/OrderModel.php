@@ -28,7 +28,7 @@ class OrderModel extends Model {
         return ['data' => $stmt->fetchAll(), 'total' => $total, 'per_page' => $perPage, 'current_page' => $page, 'last_page' => max(1,(int)ceil($total/$perPage))];
     }
 
-    public function findWithDetails($id): array|false {
+    public function findWithDetails($id) {
         return $this->rawQueryOne(
             "SELECT o.*, b_user.first_name, b_user.last_name, b_user.email as buyer_email,
                     b_user.phone as buyer_phone, b.company_name, co.name as cooperative_name,

@@ -14,7 +14,7 @@ class CropModel extends Model {
         return $this->db->query("SELECT * FROM crop_categories ORDER BY name")->fetchAll();
     }
 
-    public function getWithCategory($id): array|false {
+    public function getWithCategory($id) {
         return $this->rawQueryOne(
             "SELECT c.*, cc.name as category_name FROM crops c
              JOIN crop_categories cc ON c.category_id=cc.id WHERE c.id=?", [$id]
