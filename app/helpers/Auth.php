@@ -25,36 +25,35 @@ class Auth {
         session_destroy();
     }
 
-    public static function check(): bool    { return !empty($_SESSION['user_id']); }
-    public static function id(): ?int       { return $_SESSION['user_id'] ?? null; }
-    public static function role(): ?string  { return $_SESSION['role'] ?? null; }
-    public static function name(): string   { return $_SESSION['full_name'] ?? 'Guest'; }
-    public static function email(): string  { return $_SESSION['email'] ?? ''; }
-    public static function avatar(): ?string { return $_SESSION['avatar'] ?? null; }
+    public static function check()    { return !empty($_SESSION['user_id']); }
+    public static function id()       { return $_SESSION['user_id'] ?? null; }
+    public static function role()     { return $_SESSION['role'] ?? null; }
+    public static function name()     { return $_SESSION['full_name'] ?? 'Guest'; }
+    public static function email()    { return $_SESSION['email'] ?? ''; }
+    public static function avatar()   { return $_SESSION['avatar'] ?? null; }
 
-    public static function is(string ...$roles): bool {
+    public static function is(...$roles) {
         return in_array(self::role(), $roles);
     }
 
-    public static function csrfToken(): string {
+    public static function csrfToken() {
         return $_SESSION['csrf_token'] ?? '';
     }
 
-    public static function csrfField(): string {
+    public static function csrfField() {
         return '<input type="hidden" name="_token" value="' . self::csrfToken() . '">';
     }
 
-    public static function verifyCsrf($token): bool {
+    public static function verifyCsrf($token) {
         return hash_equals($_SESSION['csrf_token'] ?? '', $token);
     }
 
-    public static function dashboardUrl(): string {
-        return match(self::role()) {
-            'admin'                => '/admin/dashboard',
-            'cooperative_manager'  => '/cooperative/dashboard',
-            'farmer'               => '/farmer/dashboard',
-            'buyer'                => '/buyer/dashboard',
-            default                => '/',
-        };
+    public static function dashboardUrl() {
+        $role = self::role();
+        if ($role === 'admin')               return '/admin/dashboard';
+        if ($role === 'cooperative_manager') return '/cooperative/dashboard';
+        if ($role === 'farmer')              return '/farmer/dashboard';
+        if ($role === 'buyer')               return '/buyer/dashboard';
+        return '/';
     }
 }
