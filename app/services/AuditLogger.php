@@ -1,8 +1,8 @@
 <?php
 class AuditLogger {
-    private static ?PDO $db = null;
+    private static $db = null;
 
-    private static function db(): PDO {
+    private static function db() {
         if (!self::$db) self::$db = Database::getInstance();
         return self::$db;
     }

@@ -26,7 +26,7 @@ class FarmerModel extends Model {
         return ['data' => $stmt->fetchAll(), 'total' => $total, 'per_page' => $perPage, 'current_page' => $page, 'last_page' => max(1,(int)ceil($total/$perPage))];
     }
 
-    public function findByUserId($userId): array|false {
+    public function findByUserId($userId) {
         $stmt = $this->db->prepare(
             "SELECT f.*, u.first_name, u.last_name, u.email, u.phone, u.avatar, u.status,
                     d.name as district_name, co.name as cooperative_name
