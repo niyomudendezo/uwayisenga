@@ -5,7 +5,7 @@
  * Can optionally call a Python FastAPI microservice if configured.
  */
 class AIPredictionService {
-    private PDO $db;
+    private $db;
     private $aiServiceUrl;
     private $useExternalAI;
 
@@ -15,7 +15,7 @@ class AIPredictionService {
         $this->useExternalAI = (bool) $this->getSetting('ai_enabled', '0');
     }
 
-    private function getSetting($key, $default = ''): string {
+    private function getSetting($key, $default = '') {
         $stmt = $this->db->prepare("SELECT value FROM settings WHERE key_name=?");
         $stmt->execute([$key]);
         return $stmt->fetchColumn() ?: $default;
@@ -131,7 +131,7 @@ class AIPredictionService {
         foreach ($daily as $date => $values) {
             $combined[] = ['price_date' => $date, 'price' => array_sum($values) / count($values)];
         }
-        usort($combined, static fn($a, $b) => strcmp($b['price_date'], $a['price_date']));
+        usort($combined, function($a, $b) { return strcmp($b['price_date'], $a['price_date']); });
         return array_slice($combined, 0, 24);
     }
 

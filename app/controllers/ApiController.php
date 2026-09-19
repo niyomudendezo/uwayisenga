@@ -61,7 +61,7 @@ class ApiController extends Controller {
                     'label' => $cropSeries['label'],
                     'unit' => $cropSeries['unit'],
                     'data' => array_map(
-                        static fn($date) => $cropSeries['values'][$date] ?? null,
+                        function($date) use ($cropSeries) { return $cropSeries['values'][$date] ?? null; },
                         $labels
                     ),
                 ];

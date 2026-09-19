@@ -37,7 +37,7 @@
           $totalAvail = array_sum(array_column($inventory, 'qty_available'));
           $totalReserved = array_sum(array_column($inventory, 'qty_reserved'));
           $totalSold = array_sum(array_column($inventory, 'qty_sold'));
-          $totalValue = array_sum(array_map(fn($r) => $r['qty_available'] * $r['asking_price'], $inventory));
+          $totalValue = array_sum(array_map(function($r) { return $r['qty_available'] * $r['asking_price']; }, $inventory));
         ?>
         <div class="row g-2 text-center">
           <div class="col-6">

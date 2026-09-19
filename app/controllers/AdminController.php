@@ -412,44 +412,44 @@ class AdminController extends Controller {
     public function reportPrices(){
         $format = $_GET['format'] ?? 'pdf';
         $rows = (new MarketPriceModel())->getAllPaginated(1, 10000)['data'];
-        $out = array_map(fn($r) => [
+        $out = array_map(function($r) { return [
             $r['crop_name'], $r['price'], $r['unit'] ?? 'kg',
             $r['district_name'] ?? 'National', $r['price_date'], $r['source'] ?? '-'
-        ], $rows);
+        ]; }, $rows);
         $this->renderReport('Market Prices Report', ['Crop','Price (RWF)','Unit','District','Date','Source'], $out, $format);
     }
 
     public function reportOrders(){
         $format = $_GET['format'] ?? 'pdf';
         $rows = (new OrderModel())->getAllWithDetails(1, 10000)['data'];
-        $out = array_map(fn($r) => [
+        $out = array_map(function($r) { return [
             $r['order_no'],
             trim(($r['company_name'] ?? '') ?: ($r['first_name'] . ' ' . $r['last_name'])),
             $r['cooperative_name'] ?? '-',
             $r['total_amount'], $r['status'], $r['created_at']
-        ], $rows);
+        ]; }, $rows);
         $this->renderReport('Orders Report', ['Order No','Buyer','Cooperative','Amount (RWF)','Status','Date'], $out, $format);
     }
 
     public function reportInventory(){
         $format = $_GET['format'] ?? 'pdf';
         $rows = (new InventoryModel())->getAllWithDetails(1, 10000)['data'];
-        $out = array_map(fn($r) => [
+        $out = array_map(function($r) { return [
             $r['crop_name'], $r['cooperative_name'], $r['warehouse_name'] ?? '-',
             $r['qty_available'], $r['qty_reserved'], $r['qty_sold'],
             $r['grade'], $r['asking_price'], $r['status']
-        ], $rows);
+        ]; }, $rows);
         $this->renderReport('Inventory Report', ['Crop','Cooperative','Warehouse','Available','Reserved','Sold','Grade','Price (RWF)','Status'], $out, $format);
     }
 
     public function reportAi(){
         $format = $_GET['format'] ?? 'pdf';
         $rows = (new AIPredictionService())->getLatestPredictions(10000);
-        $out = array_map(fn($r) => [
+        $out = array_map(function($r) { return [
             $r['crop_name'], $r['district_name'] ?? '-', $r['predicted_demand'],
             $r['predicted_price'], $r['confidence_score'] . '%',
             $r['best_selling_period'], $r['prediction_date']
-        ], $rows);
+        ]; }, $rows);
         $this->renderReport('AI Predictions Report', ['Crop','District','Demand','Predicted Price (RWF)','Confidence','Best Period','Date'], $out, $format);
     }
 

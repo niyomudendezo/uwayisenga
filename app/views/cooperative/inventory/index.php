@@ -5,7 +5,7 @@ $filterParams = array_filter([
     'crop' => $cropId ?: null,
     'date_from' => $dateFrom,
     'date_to' => $dateTo,
-], static fn($value) => $value !== null && $value !== '');
+], function($value) { return $value !== null && $value !== ''; });
 $paginationUrl = APP_URL . '/cooperative/inventory' . ($filterParams ? '?' . http_build_query($filterParams) : '');
 ?>
 <div class="stock-page">

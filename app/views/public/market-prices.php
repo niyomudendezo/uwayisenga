@@ -3,7 +3,7 @@ $title = 'Market Prices';
 $priceCount = count($prices);
 $cropCount = count(array_unique(array_column($prices, 'crop_name')));
 $districtCount = count(array_filter(array_unique(array_column($prices, 'district_name'))));
-$latestDate = !empty($prices) ? max(array_map(static fn($price) => strtotime($price['price_date']), $prices)) : null;
+$latestDate = !empty($prices) ? max(array_map(function($price) { return strtotime($price['price_date']); }, $prices)) : null;
 $selectedCropName = 'All crops';
 foreach ($crops as $crop) {
     if ((int) $selectedCrop === (int) $crop['id']) { $selectedCropName = $crop['name']; break; }

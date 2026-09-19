@@ -80,7 +80,7 @@ class InventoryModel extends Model {
         );
     }
 
-    public function confirmSale($id, $qty): bool {
+    public function confirmSale($id, $qty) {
         $updated = $this->rawExecute(
             "UPDATE inventories SET qty_reserved=qty_reserved-?, qty_sold=qty_sold+? WHERE id=?",
             [$qty, $qty, $id]
@@ -126,7 +126,7 @@ class InventoryModel extends Model {
         return $updated;
     }
 
-    public function recordMovement($inventoryId, $type, $qty, ?string $referenceType = null, ?int $referenceId = null, ?string $date = null): bool {
+    public function recordMovement($inventoryId, $type, $qty, $referenceType = null, $referenceId = null, $date = null) {
         return $this->rawExecute(
             "INSERT INTO inventory_movements (inventory_id,movement_type,quantity,movement_date,reference_type,reference_id) VALUES (?,?,?,?,?,?)",
             [$inventoryId, $type, $qty, $date ?: date('Y-m-d H:i:s'), $referenceType, $referenceId]
@@ -135,7 +135,7 @@ class InventoryModel extends Model {
 
     private function applyPeriodBalances($rows, $dateFrom, $dateTo): array {
         if (!$rows) { return $rows; }
-        $ids = array_map(static fn($row) => (int)$row['id'], $rows);
+        $ids = array_map(function($row) { return (int)$row['id']; }, $rows);
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
         $from = $dateFrom ?: '1000-01-01';
         $to = $dateTo ? $dateTo . ' 23:59:59' : '9999-12-31 23:59:59';
@@ -145,7 +145,7 @@ class InventoryModel extends Model {
                        SUM(CASE WHEN movement_date >= ? AND movement_date <= ? AND movement_type='out' THEN quantity ELSE 0 END) period_out
                 FROM inventory_movements WHERE inventory_id IN ($placeholders) GROUP BY inventory_id";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([$from, $from, $to, $from, $to, ...$ids]);
+        $stmt->execute(array_merge([$from, $from, $to, $from, $to], $ids));
         $balances = [];
         foreach ($stmt->fetchAll() as $balance) { $balances[(int)$balance['inventory_id']] = $balance; }
         foreach ($rows as &$row) {

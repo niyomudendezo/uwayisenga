@@ -1,5 +1,5 @@
 <?php $title = 'Buyers Management';
-$pendingCount = count(array_filter($result['data'], fn($b) => !$b['verified']));
+$pendingCount = count(array_filter($result['data'], function($b) { return !$b['verified']; }));
 ?>
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h5 class="fw-bold mb-0"><i class="bi bi-shop text-success me-2"></i>Buyers</h5>

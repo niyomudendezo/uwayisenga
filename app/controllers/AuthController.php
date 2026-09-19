@@ -48,7 +48,7 @@ class AuthController extends Controller {
         $userModel = new UserModel();
         $this->view('auth/register', [
             'title'     => 'Register',
-            'roles'     => array_filter($userModel->getRoles(), fn($r) => in_array($r['name'], ['farmer','buyer'])),
+            'roles'     => array_filter($userModel->getRoles(), function($r) { return in_array($r['name'], ['farmer','buyer']); }),
             'districts' => (new Database())->getInstance()->query("SELECT * FROM districts ORDER BY name")->fetchAll(),
         ], 'auth');
     }

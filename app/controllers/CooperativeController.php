@@ -1,7 +1,7 @@
 <?php
 class CooperativeController extends Controller {
 
-    private CooperativeModel $coopModel;
+    private $coopModel;
     private $coopId;
 
     public function __construct() {
@@ -21,7 +21,7 @@ class CooperativeController extends Controller {
         $stats = [
             'members'       => count($this->coopModel->getMembers($this->coopId)),
             'inventory_val' => $invModel->getSummaryStats($this->coopId)['total_value'] ?? 0,
-            'active_orders' => count(array_filter($orderModel->getStatusCounts($this->coopId), fn($s) => in_array($s['status'], ['pending','approved']))),
+            'active_orders' => count(array_filter($orderModel->getStatusCounts($this->coopId), function($s) { return in_array($s['status'], ['pending','approved']); })),
             'revenue'       => $this->coopModel->getRevenueStats($this->coopId)['completed_revenue'] ?? 0,
         ];
         $inventory      = $invModel->getAllWithDetails(1, 5, '', $this->coopId)['data'];
@@ -190,7 +190,7 @@ class CooperativeController extends Controller {
         $result   = $model->getAllWithDetails($page, 15, $search, $farmerId, $this->coopId);
         // Filter by crop in PHP since HarvestModel doesn't have cropId param
         if ($cropId) {
-            $filtered = array_filter($result['data'], fn($h) => $h['crop_id'] == $cropId);
+            $filtered = array_filter($result['data'], function($h) use ($cropId) { return $h['crop_id'] == $cropId; });
             $result['data'] = array_values($filtered);
         }
         $this->view('cooperative/harvests', [
@@ -369,51 +369,51 @@ class CooperativeController extends Controller {
 
     public function reportMembers(){
         $format = $_GET['format'] ?? 'pdf';
-        $rows = array_map(fn($m) => [
+        $rows = array_map(function($m) { return [
             $m['first_name'], $m['last_name'], $m['email'], $m['phone'] ?? '-',
             $m['farm_name'] ?? '-', $m['farm_size'] ?? '-', $m['status']
-        ], $this->coopModel->getMembers($this->coopId));
+        ]; }, $this->coopModel->getMembers($this->coopId));
         $this->renderReport('Members Report', ['First Name','Last Name','Email','Phone','Farm Name','Farm Size (ha)','Status'], $rows, $format);
     }
 
     public function reportHarvests(){
         $format = $_GET['format'] ?? 'pdf';
         $rows = (new HarvestModel())->getAllWithDetails(1, 10000, '', 0, $this->coopId)['data'];
-        $out = array_map(fn($r) => [
+        $out = array_map(function($r) { return [
             $r['first_name'] . ' ' . $r['last_name'], $r['crop_name'],
             $r['quantity'], $r['crop_unit'], $r['grade'], $r['season'] ?? '-', $r['harvest_date']
-        ], $rows);
+        ]; }, $rows);
         $this->renderReport('Harvests Report', ['Farmer','Crop','Quantity','Unit','Grade','Season','Date'], $out, $format);
     }
 
     public function reportInventory(){
         $format = $_GET['format'] ?? 'pdf';
         $rows = (new InventoryModel())->getAllWithDetails(1, 10000, '', $this->coopId)['data'];
-        $out = array_map(fn($r) => [
+        $out = array_map(function($r) { return [
             $r['crop_name'], $r['warehouse_name'] ?? '-', $r['qty_available'],
             $r['qty_reserved'], $r['qty_sold'], $r['grade'], $r['asking_price'], $r['status']
-        ], $rows);
+        ]; }, $rows);
         $this->renderReport('Inventory Report', ['Crop','Warehouse','Available','Reserved','Sold','Grade','Price (RWF)','Status'], $out, $format);
     }
 
     public function reportOrders(){
         $format = $_GET['format'] ?? 'pdf';
         $rows = (new OrderModel())->getAllWithDetails(1, 10000, '', '', $this->coopId)['data'];
-        $out = array_map(fn($r) => [
+        $out = array_map(function($r) { return [
             $r['order_no'],
             trim(($r['company_name'] ?? '') ?: ($r['first_name'] . ' ' . $r['last_name'])),
             $r['total_amount'], $r['status'], $r['created_at']
-        ], $rows);
+        ]; }, $rows);
         $this->renderReport('Orders Report', ['Order No','Buyer','Amount (RWF)','Status','Date'], $out, $format);
     }
 
     public function reportAi(){
         $format = $_GET['format'] ?? 'pdf';
         $rows = (new AIPredictionService())->getLatestPredictions(10000);
-        $out = array_map(fn($r) => [
+        $out = array_map(function($r) { return [
             $r['crop_name'], $r['predicted_demand'], $r['predicted_price'],
             $r['confidence_score'] . '%', $r['best_selling_period'], $r['prediction_date']
-        ], $rows);
+        ]; }, $rows);
         $this->renderReport('AI Predictions Report', ['Crop','Demand','Predicted Price (RWF)','Confidence','Best Period','Date'], $out, $format);
     }
 

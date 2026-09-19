@@ -1,29 +1,29 @@
 <?php
 abstract class Model {
-    protected PDO $db;
+    protected $db;
     protected $table;
 
     public function __construct() {
         $this->db = Database::getInstance();
     }
 
-    public function find($id): array|false {
+    public function find($id) {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch();
     }
 
-    public function findBy($column, mixed $value): array|false {
+    public function findBy($column, $value) {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE {$column} = ?");
         $stmt->execute([$value]);
         return $stmt->fetch();
     }
 
-    public function all($orderBy = 'id DESC'): array {
+    public function all($orderBy = 'id DESC') {
         return $this->db->query("SELECT * FROM {$this->table} ORDER BY {$orderBy}")->fetchAll();
     }
 
-    public function create($data): int {
+    public function create($data) {
         $cols = implode(',', array_keys($data));
         $placeholders = implode(',', array_fill(0, count($data), '?'));
         $stmt = $this->db->prepare("INSERT INTO {$this->table} ({$cols}) VALUES ({$placeholders})");
@@ -31,10 +31,12 @@ abstract class Model {
         return (int) $this->db->lastInsertId();
     }
 
-    public function update($id, $data): bool {
-        $set = implode(',', array_map(fn($k) => "{$k}=?", array_keys($data)));
+    public function update($id, $data) {
+        $set = implode(',', array_map(function($k) { return "{$k}=?"; }, array_keys($data)));
         $stmt = $this->db->prepare("UPDATE {$this->table} SET {$set} WHERE id=?");
-        return $stmt->execute([...array_values($data), $id]);
+        $values = array_values($data);
+        $values[] = $id;
+        return $stmt->execute($values);
     }
 
     public function delete($id): bool {
@@ -73,7 +75,7 @@ abstract class Model {
         return $stmt->fetchAll();
     }
 
-    public function rawQueryOne($sql, $params = []): array|false {
+    public function rawQueryOne($sql, $params = []) {
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetch();
