@@ -1,8 +1,8 @@
 <?php
 class WarehouseModel extends Model {
-    protected string $table = 'warehouses';
+    protected $table = 'warehouses';
 
-    public function getAllWithDetails(string $search = '', string $status = ''): array {
+    public function getAllWithDetails($search = '', $status = ''): array {
         $where = []; $params = [];
         if ($search) { $where[] = "(w.name LIKE ? OR w.location LIKE ?)"; $params = array_merge($params, ["%$search%", "%$search%"]); }
         if ($status) { $where[] = "w.status=?"; $params[] = $status; }
@@ -22,7 +22,7 @@ class WarehouseModel extends Model {
         return $stmt->fetchAll();
     }
 
-    public function getById(int $id): ?array {
+    public function getById($id): ?array {
         $stmt = $this->db->prepare(
             "SELECT w.*, co.name as cooperative_name, d.name as district_name
              FROM warehouses w
@@ -34,7 +34,7 @@ class WarehouseModel extends Model {
         return $stmt->fetch() ?: null;
     }
 
-    public function getInventory(int $warehouseId): array {
+    public function getInventory($warehouseId): array {
         $stmt = $this->db->prepare(
             "SELECT i.*, c.name as crop_name, c.unit as crop_unit, co.name as cooperative_name
              FROM inventories i
@@ -57,7 +57,7 @@ class WarehouseModel extends Model {
         return $stmt->fetch();
     }
 
-    public function create(array $data): int {
+    public function create($data): int {
         $this->db->prepare(
             "INSERT INTO warehouses (cooperative_id,name,location,district_id,capacity,capacity_unit,status)
              VALUES (?,?,?,?,?,?,?)"
@@ -73,7 +73,7 @@ class WarehouseModel extends Model {
         return (int) $this->db->lastInsertId();
     }
 
-    public function update(int $id, array $data): bool {
+    public function update($id, $data): bool {
         return $this->rawExecute(
             "UPDATE warehouses SET cooperative_id=?,name=?,location=?,district_id=?,capacity=?,capacity_unit=?,status=? WHERE id=?",
             [
@@ -89,7 +89,7 @@ class WarehouseModel extends Model {
         );
     }
 
-    public function delete(int $id): bool {
+    public function delete($id): bool {
         return $this->rawExecute("DELETE FROM warehouses WHERE id=?", [$id]);
     }
 }

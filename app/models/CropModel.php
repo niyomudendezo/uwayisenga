@@ -1,6 +1,6 @@
 <?php
 class CropModel extends Model {
-    protected string $table = 'crops';
+    protected $table = 'crops';
 
     public function getAllWithCategory(): array {
         return $this->rawQuery(
@@ -14,14 +14,14 @@ class CropModel extends Model {
         return $this->db->query("SELECT * FROM crop_categories ORDER BY name")->fetchAll();
     }
 
-    public function getWithCategory(int $id): array|false {
+    public function getWithCategory($id): array|false {
         return $this->rawQueryOne(
             "SELECT c.*, cc.name as category_name FROM crops c
              JOIN crop_categories cc ON c.category_id=cc.id WHERE c.id=?", [$id]
         );
     }
 
-    public function paginated(int $page, int $perPage, string $search = '', int $categoryId = 0): array {
+    public function paginated($page, $perPage, $search = '', $categoryId = 0): array {
         $where = []; $params = [];
         if ($search)    { $where[] = "(c.name LIKE ? OR c.variety LIKE ?)"; $params = array_merge($params, ["%$search%","%$search%"]); }
         if ($categoryId){ $where[] = "c.category_id=?"; $params[] = $categoryId; }

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediaMTX HLS Live Stream</title>
+  <!-- Load hls.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background-color: #121212;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .video-container {
+      width: 100%;
+      max-width: 960px;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+    video {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      background-color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="video-container">
+    <h2>MediaMTX Stream (mystream)</h2>
+    <video id="video" controls autoplay muted playsinline></video>
+  </div>
+
+  <script>
+    const video = document.getElementById('video');
+    const videoSrc = 'http://72.62.158.140:8888/mystream/index.m3u8';
+
+    if (Hls.isSupported()) {
+      const hls = new Hls({
+        lowLatencyMode: true, // Optimizes latency for LL-HLS
+      });
+      hls.loadSource(videoSrc);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, function () {
+        video.play().catch(() => {
+          console.log('Autoplay blocked. User interaction required to play audio.');
+        });
+      });
+    } 
+    // Fallback for native HLS support (Safari / iOS)
+    else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = videoSrc;
+      video.addEventListener('loadedmetadata', function () {
+        video.play();
+      });
+    }
+  </script>
+
+</body>
+</html>

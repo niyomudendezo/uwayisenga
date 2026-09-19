@@ -1,16 +1,16 @@
 <?php
 class Router {
-    private array $routes = [];
+    private $routes = [];
 
-    public function get(string $path, string $controller, string $method): void {
+    public function get($path, $controller, $method){
         $this->routes['GET'][$path] = [$controller, $method];
     }
 
-    public function post(string $path, string $controller, string $method): void {
+    public function post($path, $controller, $method){
         $this->routes['POST'][$path] = [$controller, $method];
     }
 
-    public function dispatch(string $uri, string $httpMethod): void {
+    public function dispatch($uri, $httpMethod){
         $uri = strtok($uri, '?');
         $uri = rtrim($uri, '/') ?: '/';
 

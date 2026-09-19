@@ -1,48 +1,48 @@
 <?php
 class ApiController extends Controller {
 
-    public function notifications(): void {
+    public function notifications(){
         $this->requireAuth();
         $notifications = NotificationService::getRecent(Auth::id(), 10);
         $unread        = NotificationService::unreadCount(Auth::id());
         $this->json(['notifications' => $notifications, 'unread' => $unread]);
     }
 
-    public function markRead(): void {
+    public function markRead(){
         $this->requireAuth();
         $this->validateCsrf();
         NotificationService::markRead(Auth::id());
         $this->json(['success' => true]);
     }
 
-    public function districts(): void {
+    public function districts(){
         $stmt = Database::getInstance()->query("SELECT id, name FROM districts ORDER BY name");
         $this->json($stmt->fetchAll());
     }
 
-    public function sectors(string $districtId): void {
+    public function sectors($districtId){
         $stmt = Database::getInstance()->prepare("SELECT id, name FROM sectors WHERE district_id=? ORDER BY name");
         $stmt->execute([(int)$districtId]);
         $this->json($stmt->fetchAll());
     }
 
-    public function cells(string $sectorId): void {
+    public function cells($sectorId){
         $stmt = Database::getInstance()->prepare("SELECT id, name FROM cells WHERE sector_id=? ORDER BY name");
         $stmt->execute([(int) $sectorId]);
         $this->json($stmt->fetchAll());
     }
 
-    public function villages(string $cellId): void {
+    public function villages($cellId){
         $stmt = Database::getInstance()->prepare("SELECT id, name FROM villages WHERE cell_id=? ORDER BY name");
         $stmt->execute([(int) $cellId]);
         $this->json($stmt->fetchAll());
     }
 
-    public function crops(): void {
+    public function crops(){
         $this->json((new CropModel())->getAllWithCategory());
     }
 
-    public function priceChart(string $cropId): void {
+    public function priceChart($cropId){
         $months     = (int) ($_GET['months'] ?? 12);
         $districtId = (int) ($_GET['district'] ?? 0);
         $model      = new MarketPriceModel();

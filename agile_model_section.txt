@@ -1,0 +1,31 @@
+3.X Agile Development Model
+
+This project adopted the Agile software development model to guide the design and implementation
+of the AgruKrwanda platform. Agile is an iterative and incremental approach that emphasizes
+flexibility, collaboration, and continuous delivery of working software.
+
+WHY AGILE?
+
+Given the complexity of AgruKrwanda — involving multiple user roles (Admin, Cooperative Manager,
+Farmer, Buyer), real-time market pricing, AI predictions, and inventory management — Agile was
+chosen because:
+
+- Requirements could evolve as stakeholder feedback was gathered
+- Features could be developed and tested in short sprints
+- Each module (auth, marketplace, harvests, reports) could be delivered independently
+- Issues could be identified and fixed early without affecting the entire system
+
+SPRINTS OVERVIEW
+
+Sprint 1 | Foundation       | Database schema (28 tables), MVC structure, authentication
+Sprint 2 | Core Roles       | Admin dashboard, Farmer harvest recording, Buyer marketplace
+Sprint 3 | Cooperative      | Cooperative manager module, inventory, production plans
+Sprint 4 | Intelligence     | AI crop prediction service, market price trends, Chart.js dashboards
+Sprint 5 | Polish           | Reports, notifications, audit logging, UI refinement
+
+AGILE PRACTICES APPLIED
+
+- Iterative development with testable increments per sprint
+- Continuous integration of modules into the MVC framework
+- Regular self-review and refinement of features
+- Backlog prioritization based on user role importance

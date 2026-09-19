@@ -2,7 +2,7 @@
 class BuyerController extends Controller {
 
     private BuyerModel $buyerModel;
-    private array $buyer;
+    private $buyer;
 
     public function __construct() {
         $this->requireRole('buyer');
@@ -12,7 +12,7 @@ class BuyerController extends Controller {
         $this->buyer = $buyer;
     }
 
-    public function dashboard(): void {
+    public function dashboard(){
         $stats   = $this->buyerModel->getOrderStats($this->buyer['id']);
         $orders  = $this->buyerModel->getPurchaseHistory($this->buyer['id']);
         $prices  = (new MarketPriceModel())->getLatestPrices();
@@ -31,7 +31,7 @@ class BuyerController extends Controller {
         ]);
     }
 
-    public function marketplace(): void {
+    public function marketplace(){
         $invModel   = new InventoryModel();
         $search     = $_GET['search'] ?? '';
         $districtId = (int)($_GET['district'] ?? 0);
@@ -51,7 +51,7 @@ class BuyerController extends Controller {
         ]);
     }
 
-    public function orders(): void {
+    public function orders(){
         $model  = new OrderModel();
         $page   = (int)($_GET['page'] ?? 1);
         $status = $_GET['status'] ?? '';
@@ -59,7 +59,7 @@ class BuyerController extends Controller {
         $this->view('buyer/orders/index', ['title' => 'My Orders', 'result' => $result, 'status' => $status]);
     }
 
-    public function orderDetail(string $id): void {
+    public function orderDetail($id){
         $model = new OrderModel();
         $order = $model->findWithDetails((int)$id);
         if (!$order || $order['buyer_id'] != $this->buyer['id']) { $this->flash('danger', 'Order not found.'); $this->redirect('/buyer/orders'); return; }
@@ -67,7 +67,7 @@ class BuyerController extends Controller {
         $this->view('buyer/orders/detail', ['title' => 'Order #' . $order['order_no'], 'order' => $order, 'items' => $items]);
     }
 
-    public function placeOrder(): void {
+    public function placeOrder(){
         if (!$this->isPost()) { $this->redirect('/buyer/marketplace'); return; }
         $this->validateCsrf();
 
@@ -124,7 +124,7 @@ class BuyerController extends Controller {
         }
     }
 
-    public function cancelOrder(string $id): void {
+    public function cancelOrder($id){
         if (!$this->isPost()) { $this->redirect('/buyer/orders'); return; }
         $this->validateCsrf();
         $model = new OrderModel();
@@ -140,7 +140,7 @@ class BuyerController extends Controller {
         $this->redirect('/buyer/orders');
     }
 
-    public function profile(): void {
+    public function profile(){
         $db = Database::getInstance();
         $this->view('buyer/profile', [
             'title'     => 'My Profile',
@@ -149,7 +149,7 @@ class BuyerController extends Controller {
         ]);
     }
 
-    public function updateProfile(): void {
+    public function updateProfile(){
         if (!$this->isPost()) { $this->redirect('/buyer/profile'); return; }
         $this->validateCsrf();
         (new UserModel())->update(Auth::id(), [
@@ -168,7 +168,7 @@ class BuyerController extends Controller {
         $this->redirect('/buyer/profile');
     }
 
-    public function marketPrices(): void {
+    public function marketPrices(){
         $priceModel = new MarketPriceModel();
         $cropId     = (int)($_GET['crop'] ?? 0);
         $this->view('buyer/market-prices', [
@@ -181,7 +181,7 @@ class BuyerController extends Controller {
         ]);
     }
 
-    public function storeOffer(): void {
+    public function storeOffer(){
         if (!$this->isPost()) { $this->redirect('/buyer/marketplace'); return; }
         $this->validateCsrf();
         $data = [

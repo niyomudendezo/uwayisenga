@@ -1,8 +1,8 @@
 <?php
 class CooperativeModel extends Model {
-    protected string $table = 'cooperatives';
+    protected $table = 'cooperatives';
 
-    public function getAllWithDetails(int $page = 1, int $perPage = 15, string $search = ''): array {
+    public function getAllWithDetails($page = 1, $perPage = 15, $search = ''): array {
         $where = ''; $params = [];
         if ($search) { $where = "WHERE c.name LIKE ? OR c.registration_no LIKE ?"; $params = ["%$search%","%$search%"]; }
 
@@ -23,7 +23,7 @@ class CooperativeModel extends Model {
         return ['data' => $stmt->fetchAll(), 'total' => $total, 'per_page' => $perPage, 'current_page' => $page, 'last_page' => max(1,(int)ceil($total/$perPage))];
     }
 
-    public function findWithDetails(int $id): array|false {
+    public function findWithDetails($id): array|false {
         $stmt = $this->db->prepare(
             "SELECT c.*, d.name as district_name, u.first_name, u.last_name, u.email as manager_email
              FROM cooperatives c
@@ -35,7 +35,7 @@ class CooperativeModel extends Model {
         return $stmt->fetch();
     }
 
-    public function getMembers(int $cooperativeId): array {
+    public function getMembers($cooperativeId): array {
         $stmt = $this->db->prepare(
             "SELECT f.id as farmer_id, f.cooperative_id, f.farm_name, f.farm_size,
                     f.soil_type, f.irrigation,
@@ -50,7 +50,7 @@ class CooperativeModel extends Model {
         return $stmt->fetchAll();
     }
 
-    public function getInventorySummary(int $cooperativeId): array {
+    public function getInventorySummary($cooperativeId): array {
         $stmt = $this->db->prepare(
             "SELECT c.name as crop_name, c.unit,
                     SUM(i.qty_available) as available,
@@ -65,13 +65,13 @@ class CooperativeModel extends Model {
         return $stmt->fetchAll();
     }
 
-    public function getByManagerId(int $userId): array|false {
+    public function getByManagerId($userId): array|false {
         $stmt = $this->db->prepare("SELECT * FROM cooperatives WHERE manager_id=? LIMIT 1");
         $stmt->execute([$userId]);
         return $stmt->fetch();
     }
 
-    public function getRevenueStats(int $cooperativeId): array {
+    public function getRevenueStats($cooperativeId): array {
         $stmt = $this->db->prepare(
             "SELECT COALESCE(SUM(o.total_amount),0) as total_revenue,
                     COUNT(o.id) as total_orders,

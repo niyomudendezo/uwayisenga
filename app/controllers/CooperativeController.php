@@ -2,7 +2,7 @@
 class CooperativeController extends Controller {
 
     private CooperativeModel $coopModel;
-    private int $coopId;
+    private $coopId;
 
     public function __construct() {
         $this->requireRole('cooperative_manager');
@@ -12,7 +12,7 @@ class CooperativeController extends Controller {
         $this->coopId = $coop['id'];
     }
 
-    public function dashboard(): void {
+    public function dashboard(){
         $invModel   = new InventoryModel();
         $orderModel = new OrderModel();
         $aiService  = new AIPredictionService();
@@ -33,14 +33,14 @@ class CooperativeController extends Controller {
         $this->view('cooperative/dashboard', compact('coop','stats','inventory','recentOrders','predictions','revenueByMonth','invSummary'));
     }
 
-    public function members(): void {
+    public function members(){
         $members = $this->coopModel->getMembers($this->coopId);
         $db      = Database::getInstance();
         $farmers = $db->query("SELECT f.id, u.first_name, u.last_name FROM farmers f JOIN users u ON f.user_id=u.id WHERE u.status='active'")->fetchAll();
         $this->view('cooperative/members', ['title' => 'Members', 'members' => $members, 'farmers' => $farmers, 'coopId' => $this->coopId]);
     }
 
-    public function inventory(): void {
+    public function inventory(){
         $model  = new InventoryModel();
         $page   = (int)($_GET['page'] ?? 1);
         $search = $_GET['search'] ?? '';
@@ -66,12 +66,12 @@ class CooperativeController extends Controller {
         ]);
     }
 
-    private function validDate(string $date): string {
+    private function validDate($date): string {
         $parsed = DateTime::createFromFormat('Y-m-d', $date);
         return $parsed && $parsed->format('Y-m-d') === $date ? $date : '';
     }
 
-    public function createInventory(): void {
+    public function createInventory(){
         $db = Database::getInstance();
         $this->view('cooperative/inventory/create', [
             'title'      => 'Add Inventory',
@@ -90,7 +90,7 @@ class CooperativeController extends Controller {
         ]);
     }
 
-    public function storeInventory(): void {
+    public function storeInventory(){
         if (!$this->isPost()) { $this->redirect('/cooperative/inventory'); return; }
         $this->validateCsrf();
         $data = [
@@ -117,7 +117,7 @@ class CooperativeController extends Controller {
         $this->redirect('/cooperative/inventory');
     }
 
-    public function editInventory(string $id): void {
+    public function editInventory($id){
         $model = new InventoryModel();
         $item  = $model->find((int)$id);
         if (!$item || $item['cooperative_id'] != $this->coopId) { $this->flash('danger', 'Not found.'); $this->redirect('/cooperative/inventory'); return; }
@@ -130,7 +130,7 @@ class CooperativeController extends Controller {
         ]);
     }
 
-    public function updateInventory(string $id): void {
+    public function updateInventory($id){
         if (!$this->isPost()) { $this->redirect('/cooperative/inventory'); return; }
         $this->validateCsrf();
         $model = new InventoryModel();
@@ -149,7 +149,7 @@ class CooperativeController extends Controller {
         $this->redirect('/cooperative/inventory');
     }
 
-    public function stockIn(string $id): void {
+    public function stockIn($id){
         if (!$this->isPost()) { $this->redirect('/cooperative/inventory'); return; }
         $this->validateCsrf();
         $model = new InventoryModel();
@@ -165,7 +165,7 @@ class CooperativeController extends Controller {
         $this->redirect('/cooperative/inventory');
     }
 
-    public function stockOut(string $id): void {
+    public function stockOut($id){
         if (!$this->isPost()) { $this->redirect('/cooperative/inventory'); return; }
         $this->validateCsrf();
         $model = new InventoryModel();
@@ -181,7 +181,7 @@ class CooperativeController extends Controller {
         $this->redirect('/cooperative/inventory');
     }
 
-    public function harvests(): void {
+    public function harvests(){
         $model    = new HarvestModel();
         $page     = (int)($_GET['page'] ?? 1);
         $search   = $_GET['search'] ?? '';
@@ -202,7 +202,7 @@ class CooperativeController extends Controller {
         ]);
     }
 
-    public function storeHarvest(): void {
+    public function storeHarvest(){
         if (!$this->isPost()) { $this->redirect('/cooperative/harvests'); return; }
         $this->validateCsrf();
         $data = [
@@ -222,7 +222,7 @@ class CooperativeController extends Controller {
         $this->redirect('/cooperative/harvests');
     }
 
-    public function orders(): void {
+    public function orders(){
         $model  = new OrderModel();
         $page   = (int)($_GET['page'] ?? 1);
         $search = $_GET['search'] ?? '';
@@ -231,7 +231,7 @@ class CooperativeController extends Controller {
         $this->view('cooperative/orders/index', ['title' => 'Orders', 'result' => $result, 'search' => $search, 'status' => $status]);
     }
 
-    public function orderDetail(string $id): void {
+    public function orderDetail($id){
         $model = new OrderModel();
         $order = $model->findWithDetails((int)$id);
         if (!$order || $order['cooperative_id'] != $this->coopId) { $this->flash('danger', 'Order not found.'); $this->redirect('/cooperative/orders'); return; }
@@ -239,7 +239,7 @@ class CooperativeController extends Controller {
         $this->view('cooperative/orders/detail', ['title' => 'Order #' . $order['order_no'], 'order' => $order, 'items' => $items]);
     }
 
-    public function approveOrder(string $id): void {
+    public function approveOrder($id){
         if (!$this->isPost()) { $this->redirect('/cooperative/orders'); return; }
         $this->validateCsrf();
         $model = new OrderModel();
@@ -274,7 +274,7 @@ class CooperativeController extends Controller {
         $this->redirect('/cooperative/orders/' . $id);
     }
 
-    public function rejectOrder(string $id): void {
+    public function rejectOrder($id){
         if (!$this->isPost()) { $this->redirect('/cooperative/orders'); return; }
         $this->validateCsrf();
         $model = new OrderModel();
@@ -286,7 +286,7 @@ class CooperativeController extends Controller {
         $this->redirect('/cooperative/orders/' . $id);
     }
 
-    public function markDelivered(string $id): void {
+    public function markDelivered($id){
         if (!$this->isPost()) { $this->redirect('/cooperative/orders'); return; }
         $this->validateCsrf();
         $model = new OrderModel();
@@ -312,7 +312,7 @@ class CooperativeController extends Controller {
         $this->redirect('/cooperative/orders/' . $id);
     }
 
-    public function aiPredictions(): void {
+    public function aiPredictions(){
         $aiService = new AIPredictionService();
         $db        = Database::getInstance();
         $this->view('cooperative/ai-predictions', [
@@ -323,7 +323,7 @@ class CooperativeController extends Controller {
         ]);
     }
 
-    public function runPrediction(): void {
+    public function runPrediction(){
         if (!$this->isPost()) { $this->redirect('/cooperative/ai-predictions'); return; }
         $this->validateCsrf();
         $cropId     = (int)($_POST['crop_id'] ?? 0);
@@ -334,7 +334,7 @@ class CooperativeController extends Controller {
         $this->redirect('/cooperative/ai-predictions');
     }
 
-    public function reports(): void {
+    public function reports(){
         $this->view('cooperative/reports', [
             'title'   => 'Reports',
             'crops'   => (new CropModel())->getAllWithCategory(),
@@ -342,7 +342,7 @@ class CooperativeController extends Controller {
         ]);
     }
 
-    private function renderReport(string $title, array $columns, array $rows, string $format): void {
+    private function renderReport($title, $columns, $rows, $format){
         if (in_array($format, ['csv', 'excel'], true)) {
             header('Content-Type: text/csv; charset=utf-8');
             header('Content-Disposition: attachment; filename="' . strtolower(str_replace(' ','_',$title)) . '_' . date('Y-m-d') . '.csv"');
@@ -367,7 +367,7 @@ class CooperativeController extends Controller {
         echo '</tbody></table></body></html>'; exit;
     }
 
-    public function reportMembers(): void {
+    public function reportMembers(){
         $format = $_GET['format'] ?? 'pdf';
         $rows = array_map(fn($m) => [
             $m['first_name'], $m['last_name'], $m['email'], $m['phone'] ?? '-',
@@ -376,7 +376,7 @@ class CooperativeController extends Controller {
         $this->renderReport('Members Report', ['First Name','Last Name','Email','Phone','Farm Name','Farm Size (ha)','Status'], $rows, $format);
     }
 
-    public function reportHarvests(): void {
+    public function reportHarvests(){
         $format = $_GET['format'] ?? 'pdf';
         $rows = (new HarvestModel())->getAllWithDetails(1, 10000, '', 0, $this->coopId)['data'];
         $out = array_map(fn($r) => [
@@ -386,7 +386,7 @@ class CooperativeController extends Controller {
         $this->renderReport('Harvests Report', ['Farmer','Crop','Quantity','Unit','Grade','Season','Date'], $out, $format);
     }
 
-    public function reportInventory(): void {
+    public function reportInventory(){
         $format = $_GET['format'] ?? 'pdf';
         $rows = (new InventoryModel())->getAllWithDetails(1, 10000, '', $this->coopId)['data'];
         $out = array_map(fn($r) => [
@@ -396,7 +396,7 @@ class CooperativeController extends Controller {
         $this->renderReport('Inventory Report', ['Crop','Warehouse','Available','Reserved','Sold','Grade','Price (RWF)','Status'], $out, $format);
     }
 
-    public function reportOrders(): void {
+    public function reportOrders(){
         $format = $_GET['format'] ?? 'pdf';
         $rows = (new OrderModel())->getAllWithDetails(1, 10000, '', '', $this->coopId)['data'];
         $out = array_map(fn($r) => [
@@ -407,7 +407,7 @@ class CooperativeController extends Controller {
         $this->renderReport('Orders Report', ['Order No','Buyer','Amount (RWF)','Status','Date'], $out, $format);
     }
 
-    public function reportAi(): void {
+    public function reportAi(){
         $format = $_GET['format'] ?? 'pdf';
         $rows = (new AIPredictionService())->getLatestPredictions(10000);
         $out = array_map(fn($r) => [
@@ -417,7 +417,7 @@ class CooperativeController extends Controller {
         $this->renderReport('AI Predictions Report', ['Crop','Demand','Predicted Price (RWF)','Confidence','Best Period','Date'], $out, $format);
     }
 
-    public function productionPlans(): void {
+    public function productionPlans(){
         $db    = Database::getInstance();
         $plans = $db->query("SELECT pp.*, c.name as crop_name FROM production_plans pp JOIN crops c ON pp.crop_id=c.id WHERE pp.cooperative_id={$this->coopId} ORDER BY pp.created_at DESC")->fetchAll();
         $this->view('cooperative/production-plans', [
@@ -427,7 +427,7 @@ class CooperativeController extends Controller {
         ]);
     }
 
-    public function storePlan(): void {
+    public function storePlan(){
         if (!$this->isPost()) { $this->redirect('/cooperative/production-plans'); return; }
         $this->validateCsrf();
         $data = [

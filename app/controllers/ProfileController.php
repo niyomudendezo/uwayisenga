@@ -1,7 +1,7 @@
 <?php
 class ProfileController extends Controller {
 
-    public function index(): void {
+    public function index(){
         $this->requireAuth();
         $userModel = new UserModel();
         $user      = $userModel->findWithRole(Auth::id());
@@ -13,7 +13,7 @@ class ProfileController extends Controller {
         ]);
     }
 
-    public function update(): void {
+    public function update(){
         $this->requireAuth();
         if (!$this->isPost()) { $this->redirect('/profile'); return; }
         $this->validateCsrf();
@@ -38,7 +38,7 @@ class ProfileController extends Controller {
         $this->redirect('/profile');
     }
 
-    public function changePassword(): void {
+    public function changePassword(){
         $this->requireAuth();
         if (!$this->isPost()) { $this->redirect('/profile'); return; }
         $this->validateCsrf();

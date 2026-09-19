@@ -1,8 +1,8 @@
 <?php
 class FarmerModel extends Model {
-    protected string $table = 'farmers';
+    protected $table = 'farmers';
 
-    public function getAllWithDetails(int $page = 1, int $perPage = 15, string $search = '', int $districtId = 0): array {
+    public function getAllWithDetails($page = 1, $perPage = 15, $search = '', $districtId = 0): array {
         $where = []; $params = [];
         if ($search)     { $where[] = "(u.first_name LIKE ? OR u.last_name LIKE ? OR u.email LIKE ? OR f.farm_name LIKE ?)"; $params = array_merge($params, ["%$search%","%$search%","%$search%","%$search%"]); }
         if ($districtId) { $where[] = "f.district_id=?"; $params[] = $districtId; }
@@ -26,7 +26,7 @@ class FarmerModel extends Model {
         return ['data' => $stmt->fetchAll(), 'total' => $total, 'per_page' => $perPage, 'current_page' => $page, 'last_page' => max(1,(int)ceil($total/$perPage))];
     }
 
-    public function findByUserId(int $userId): array|false {
+    public function findByUserId($userId): array|false {
         $stmt = $this->db->prepare(
             "SELECT f.*, u.first_name, u.last_name, u.email, u.phone, u.avatar, u.status,
                     d.name as district_name, co.name as cooperative_name
@@ -39,7 +39,7 @@ class FarmerModel extends Model {
         return $stmt->fetch();
     }
 
-    public function getHarvestHistory(int $farmerId): array {
+    public function getHarvestHistory($farmerId): array {
         $stmt = $this->db->prepare(
             "SELECT h.*, c.name as crop_name, c.unit FROM harvests h
              JOIN crops c ON h.crop_id=c.id WHERE h.farmer_id=? ORDER BY h.harvest_date DESC"
@@ -48,13 +48,13 @@ class FarmerModel extends Model {
         return $stmt->fetchAll();
     }
 
-    public function getTotalHarvest(int $farmerId): float {
+    public function getTotalHarvest($farmerId): float {
         $stmt = $this->db->prepare("SELECT COALESCE(SUM(quantity),0) FROM harvests WHERE farmer_id=?");
         $stmt->execute([$farmerId]);
         return (float) $stmt->fetchColumn();
     }
 
-    public function getTopCrops(int $farmerId): array {
+    public function getTopCrops($farmerId): array {
         $stmt = $this->db->prepare(
             "SELECT c.name, SUM(h.quantity) as total_qty, c.unit
              FROM harvests h JOIN crops c ON h.crop_id=c.id

@@ -1,8 +1,8 @@
 <?php
 class InventoryModel extends Model {
-    protected string $table = 'inventories';
+    protected $table = 'inventories';
 
-    public function getAllWithDetails(int $page = 1, int $perPage = 15, string $search = '', int $cooperativeId = 0, int $cropId = 0, string $dateFrom = '', string $dateTo = ''): array {
+    public function getAllWithDetails($page = 1, $perPage = 15, $search = '', $cooperativeId = 0, $cropId = 0, $dateFrom = '', $dateTo = ''): array {
         $where = []; $params = [];
         if ($search)       { $where[] = "(c.name LIKE ? OR co.name LIKE ?)"; $params = array_merge($params, ["%$search%","%$search%"]); }
         if ($cooperativeId){ $where[] = "i.cooperative_id=?"; $params[] = $cooperativeId; }
@@ -29,7 +29,7 @@ class InventoryModel extends Model {
         return ['data' => $rows, 'total' => $total, 'per_page' => $perPage, 'current_page' => $page, 'last_page' => max(1,(int)ceil($total/$perPage))];
     }
 
-    public function getAvailableForBuyers(string $search = '', int $districtId = 0, int $cropId = 0, float $minQty = 0): array {
+    public function getAvailableForBuyers($search = '', $districtId = 0, $cropId = 0, $minQty = 0): array {
         $where = ["i.status='available'", "i.qty_available > 0"]; $params = [];
         if ($search)    { $where[] = "(c.name LIKE ? OR co.name LIKE ?)"; $params = array_merge($params, ["%$search%","%$search%"]); }
         if ($districtId){ $where[] = "co.district_id=?"; $params[] = $districtId; }
@@ -51,7 +51,7 @@ class InventoryModel extends Model {
         return $stmt->fetchAll();
     }
 
-    public function getSummaryStats(int $cooperativeId = 0, int $cropId = 0, string $dateFrom = '', string $dateTo = ''): array {
+    public function getSummaryStats($cooperativeId = 0, $cropId = 0, $dateFrom = '', $dateTo = ''): array {
         $where = []; $params = [];
         if ($cooperativeId) { $where[] = 'cooperative_id=?'; $params[] = $cooperativeId; }
         if ($cropId)        { $where[] = 'crop_id=?'; $params[] = $cropId; }
@@ -73,14 +73,14 @@ class InventoryModel extends Model {
         return $stmt->fetch();
     }
 
-    public function reserveStock(int $id, float $qty): bool {
+    public function reserveStock($id, $qty): bool {
         return $this->rawExecute(
             "UPDATE inventories SET qty_available=qty_available-?, qty_reserved=qty_reserved+? WHERE id=? AND qty_available>=?",
             [$qty, $qty, $id, $qty]
         );
     }
 
-    public function confirmSale(int $id, float $qty): bool {
+    public function confirmSale($id, $qty): bool {
         $updated = $this->rawExecute(
             "UPDATE inventories SET qty_reserved=qty_reserved-?, qty_sold=qty_sold+? WHERE id=?",
             [$qty, $qty, $id]
@@ -89,7 +89,7 @@ class InventoryModel extends Model {
         return $updated;
     }
 
-    public function getPeriodSummary(int $cooperativeId, int $cropId, string $dateFrom, string $dateTo): array {
+    public function getPeriodSummary($cooperativeId, $cropId, $dateFrom, $dateTo): array {
         $result = $this->getAllWithDetails(1, 100000, '', $cooperativeId, $cropId, $dateFrom, $dateTo);
         $summary = ['total_opening'=>0,'total_received'=>0,'total_out'=>0,'total_available'=>0,'total_reserved'=>0,'total_value'=>0];
         foreach ($result['data'] as $row) {
@@ -103,7 +103,7 @@ class InventoryModel extends Model {
         return $summary;
     }
 
-    public function stockIn(int $id, float $qty): bool {
+    public function stockIn($id, $qty): bool {
         $updated = $this->rawExecute(
             "UPDATE inventories
              SET qty_received=qty_received+?, qty_available=qty_available+?, status='available'
@@ -114,7 +114,7 @@ class InventoryModel extends Model {
         return $updated;
     }
 
-    public function stockOut(int $id, float $qty): bool {
+    public function stockOut($id, $qty): bool {
         $updated = $this->rawExecute(
             "UPDATE inventories
              SET qty_available=qty_available-?, qty_sold=qty_sold+?,
@@ -126,14 +126,14 @@ class InventoryModel extends Model {
         return $updated;
     }
 
-    public function recordMovement(int $inventoryId, string $type, float $qty, ?string $referenceType = null, ?int $referenceId = null, ?string $date = null): bool {
+    public function recordMovement($inventoryId, $type, $qty, ?string $referenceType = null, ?int $referenceId = null, ?string $date = null): bool {
         return $this->rawExecute(
             "INSERT INTO inventory_movements (inventory_id,movement_type,quantity,movement_date,reference_type,reference_id) VALUES (?,?,?,?,?,?)",
             [$inventoryId, $type, $qty, $date ?: date('Y-m-d H:i:s'), $referenceType, $referenceId]
         );
     }
 
-    private function applyPeriodBalances(array $rows, string $dateFrom, string $dateTo): array {
+    private function applyPeriodBalances($rows, $dateFrom, $dateTo): array {
         if (!$rows) { return $rows; }
         $ids = array_map(static fn($row) => (int)$row['id'], $rows);
         $placeholders = implode(',', array_fill(0, count($ids), '?'));

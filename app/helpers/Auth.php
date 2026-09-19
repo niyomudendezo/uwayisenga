@@ -1,13 +1,13 @@
 <?php
 class Auth {
-    public static function start(): void {
+    public static function start(){
         if (session_status() === PHP_SESSION_NONE) session_start();
         if (empty($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
     }
 
-    public static function login(array $user): void {
+    public static function login($user){
         session_regenerate_id(true);
         $_SESSION['user_id']   = $user['id'];
         $_SESSION['role']      = $user['role_name'];
@@ -16,7 +16,7 @@ class Auth {
         $_SESSION['avatar']    = $user['avatar'] ?? null;
     }
 
-    public static function logout(): void {
+    public static function logout(){
         $_SESSION = [];
         if (ini_get('session.use_cookies')) {
             $p = session_get_cookie_params();
@@ -44,7 +44,7 @@ class Auth {
         return '<input type="hidden" name="_token" value="' . self::csrfToken() . '">';
     }
 
-    public static function verifyCsrf(string $token): bool {
+    public static function verifyCsrf($token): bool {
         return hash_equals($_SESSION['csrf_token'] ?? '', $token);
     }
 

@@ -7,7 +7,7 @@ class NotificationService {
         return self::$db;
     }
 
-    public static function send(int $userId, string $type, string $title, string $message, string $link = ''): void {
+    public static function send($userId, $type, $title, $message, $link = ''){
         try {
             self::db()->prepare(
                 "INSERT INTO notifications (user_id, type, title, message, link) VALUES (?,?,?,?,?)"
@@ -15,7 +15,7 @@ class NotificationService {
         } catch (Exception $e) {}
     }
 
-    public static function sendToRole(string $role, string $type, string $title, string $message, string $link = ''): void {
+    public static function sendToRole($role, $type, $title, $message, $link = ''){
         try {
             $users = self::db()->prepare(
                 "SELECT u.id FROM users u JOIN roles r ON u.role_id=r.id WHERE r.name=? AND u.status='active'"
@@ -27,13 +27,13 @@ class NotificationService {
         } catch (Exception $e) {}
     }
 
-    public static function unreadCount(int $userId): int {
+    public static function unreadCount($userId): int {
         $stmt = self::db()->prepare("SELECT COUNT(*) FROM notifications WHERE user_id=? AND is_read=0");
         $stmt->execute([$userId]);
         return (int) $stmt->fetchColumn();
     }
 
-    public static function getRecent(int $userId, int $limit = 10): array {
+    public static function getRecent($userId, $limit = 10): array {
         $stmt = self::db()->prepare(
             "SELECT * FROM notifications WHERE user_id=? ORDER BY created_at DESC LIMIT ?"
         );
@@ -41,7 +41,7 @@ class NotificationService {
         return $stmt->fetchAll();
     }
 
-    public static function markRead(int $userId): void {
+    public static function markRead($userId){
         self::db()->prepare("UPDATE notifications SET is_read=1 WHERE user_id=?")->execute([$userId]);
     }
 }

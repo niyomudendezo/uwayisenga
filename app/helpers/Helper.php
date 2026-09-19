@@ -1,14 +1,14 @@
 <?php
 class Helper {
-    public static function formatCurrency(float $amount): string {
+    public static function formatCurrency($amount): string {
         return number_format($amount, 0, '.', ',') . ' ' . CURRENCY;
     }
 
-    public static function formatDate(string $date, string $format = 'd M Y'): string {
+    public static function formatDate($date, $format = 'd M Y'): string {
         return $date ? date($format, strtotime($date)) : '-';
     }
 
-    public static function timeAgo(string $datetime): string {
+    public static function timeAgo($datetime): string {
         $diff = time() - strtotime($datetime);
         if ($diff < 60)     return 'Just now';
         if ($diff < 3600)   return (int)($diff/60) . ' min ago';
@@ -17,7 +17,7 @@ class Helper {
         return date('d M Y', strtotime($datetime));
     }
 
-    public static function statusBadge(string $status): string {
+    public static function statusBadge($status): string {
         $map = [
             'active'      => 'success', 'inactive'   => 'secondary',
             'pending'     => 'warning', 'approved'   => 'success',
@@ -39,7 +39,7 @@ class Helper {
         return 'ORD-' . date('Y') . '-' . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
     }
 
-    public static function uploadFile(array $file, string $dir, array $allowed = ['jpg','jpeg','png','pdf']): string|false {
+    public static function uploadFile($file, $dir, $allowed = ['jpg','jpeg','png','pdf']): string|false {
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         if (!in_array($ext, $allowed)) return false;
         if ($file['size'] > 5 * 1024 * 1024) return false;
@@ -54,7 +54,7 @@ class Helper {
         return false;
     }
 
-    public static function paginate(array $result, string $baseUrl): string {
+    public static function paginate($result, $baseUrl): string {
         $total   = $result['total'];
         $perPage = $result['per_page'];
         $current = $result['current_page'];
@@ -79,7 +79,7 @@ class Helper {
         return $html;
     }
 
-    public static function e(string $str): string {
+    public static function e($str): string {
         return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
     }
 
@@ -89,15 +89,15 @@ class Helper {
         return $flash;
     }
 
-    public static function truncate(string $text, int $length = 80): string {
+    public static function truncate($text, $length = 80): string {
         return strlen($text) > $length ? substr($text, 0, $length) . '...' : $text;
     }
 
-    public static function numberFormat(float $n): string {
+    public static function numberFormat($n): string {
         return number_format($n, 2);
     }
 
-    public static function percentChange(float $old, float $new): string {
+    public static function percentChange($old, $new): string {
         if ($old == 0) return '0%';
         $pct = (($new - $old) / $old) * 100;
         $sign = $pct >= 0 ? '+' : '';

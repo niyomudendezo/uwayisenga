@@ -1,8 +1,8 @@
 <?php
 class OrderModel extends Model {
-    protected string $table = 'orders';
+    protected $table = 'orders';
 
-    public function getAllWithDetails(int $page = 1, int $perPage = 15, string $search = '', string $status = '', int $cooperativeId = 0, int $buyerId = 0): array {
+    public function getAllWithDetails($page = 1, $perPage = 15, $search = '', $status = '', $cooperativeId = 0, $buyerId = 0): array {
         $where = []; $params = [];
         if ($search)       { $where[] = "(o.order_no LIKE ? OR b_user.first_name LIKE ? OR co.name LIKE ?)"; $params = array_merge($params, ["%$search%","%$search%","%$search%"]); }
         if ($status)       { $where[] = "o.status=?"; $params[] = $status; }
@@ -28,7 +28,7 @@ class OrderModel extends Model {
         return ['data' => $stmt->fetchAll(), 'total' => $total, 'per_page' => $perPage, 'current_page' => $page, 'last_page' => max(1,(int)ceil($total/$perPage))];
     }
 
-    public function findWithDetails(int $id): array|false {
+    public function findWithDetails($id): array|false {
         return $this->rawQueryOne(
             "SELECT o.*, b_user.first_name, b_user.last_name, b_user.email as buyer_email,
                     b_user.phone as buyer_phone, b.company_name, co.name as cooperative_name,
@@ -41,14 +41,14 @@ class OrderModel extends Model {
         );
     }
 
-    public function getItems(int $orderId): array {
+    public function getItems($orderId): array {
         return $this->rawQuery(
             "SELECT oi.*, c.name as crop_name, c.unit FROM order_items oi
              JOIN crops c ON oi.crop_id=c.id WHERE oi.order_id=?", [$orderId]
         );
     }
 
-    public function updateStatus(int $id, string $status, int $reviewedBy = 0): bool {
+    public function updateStatus($id, $status, $reviewedBy = 0): bool {
         $sql = "UPDATE orders SET status=?, updated_at=NOW()";
         $params = [$status];
         if ($reviewedBy) { $sql .= ", reviewed_by=?, reviewed_at=NOW()"; $params[] = $reviewedBy; }
@@ -56,7 +56,7 @@ class OrderModel extends Model {
         return $this->rawExecute($sql, $params);
     }
 
-    public function getRevenueByMonth(int $cooperativeId = 0): array {
+    public function getRevenueByMonth($cooperativeId = 0): array {
         $where = $cooperativeId ? "AND cooperative_id=$cooperativeId" : '';
         return $this->rawQuery(
             "SELECT DATE_FORMAT(created_at,'%Y-%m') as month,
@@ -66,7 +66,7 @@ class OrderModel extends Model {
         );
     }
 
-    public function getStatusCounts(int $cooperativeId = 0): array {
+    public function getStatusCounts($cooperativeId = 0): array {
         $where = $cooperativeId ? "WHERE cooperative_id=$cooperativeId" : '';
         return $this->rawQuery("SELECT status, COUNT(*) as count FROM orders $where GROUP BY status");
     }

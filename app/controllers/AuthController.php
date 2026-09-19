@@ -1,12 +1,12 @@
 <?php
 class AuthController extends Controller {
 
-    public function loginForm(): void {
+    public function loginForm(){
         if (Auth::check()) $this->redirect(Auth::dashboardUrl());
         $this->view('auth/login', ['title' => 'Login'], 'auth');
     }
 
-    public function login(): void {
+    public function login(){
         if (!$this->isPost()) { $this->redirect('/login'); return; }
         $this->validateCsrf();
 
@@ -43,7 +43,7 @@ class AuthController extends Controller {
         $this->redirect(Auth::dashboardUrl());
     }
 
-    public function registerForm(): void {
+    public function registerForm(){
         if (Auth::check()) $this->redirect(Auth::dashboardUrl());
         $userModel = new UserModel();
         $this->view('auth/register', [
@@ -53,7 +53,7 @@ class AuthController extends Controller {
         ], 'auth');
     }
 
-    public function register(): void {
+    public function register(){
         if (!$this->isPost()) { $this->redirect('/register'); return; }
         $this->validateCsrf();
 
@@ -151,17 +151,17 @@ class AuthController extends Controller {
         }
     }
 
-    public function logout(): void {
+    public function logout(){
         AuditLogger::log('logout', 'auth', Auth::id() ?? 0);
         Auth::logout();
         $this->redirect('/login');
     }
 
-    public function forgotForm(): void {
+    public function forgotForm(){
         $this->view('auth/forgot', ['title' => 'Forgot Password'], 'auth');
     }
 
-    public function forgotPassword(): void {
+    public function forgotPassword(){
         if (!$this->isPost()) { $this->redirect('/forgot-password'); return; }
         $this->validateCsrf();
 
@@ -182,7 +182,7 @@ class AuthController extends Controller {
         $this->redirect('/forgot-password');
     }
 
-    public function resetForm(string $token): void {
+    public function resetForm($token){
         $userModel = new UserModel();
         $user = $userModel->findByResetToken($token);
         if (!$user) {
@@ -193,7 +193,7 @@ class AuthController extends Controller {
         $this->view('auth/reset', ['title' => 'Reset Password', 'token' => $token], 'auth');
     }
 
-    public function resetPassword(): void {
+    public function resetPassword(){
         if (!$this->isPost()) { $this->redirect('/login'); return; }
         $this->validateCsrf();
 

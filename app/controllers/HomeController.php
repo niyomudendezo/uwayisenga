@@ -1,7 +1,7 @@
 <?php
 class HomeController extends Controller {
 
-    public function index(): void {
+    public function index(){
         $db = Database::getInstance();
         $stats = [
             'farmers'      => (int) $db->query("SELECT COUNT(*) FROM farmers")->fetchColumn(),
@@ -13,15 +13,15 @@ class HomeController extends Controller {
         $this->view('public/home', ['title' => 'Home', 'stats' => $stats, 'latestPrices' => $latestPrices], 'public');
     }
 
-    public function about(): void {
+    public function about(){
         $this->view('public/about', ['title' => 'About Us'], 'public');
     }
 
-    public function contact(): void {
+    public function contact(){
         $this->view('public/contact', ['title' => 'Contact Us'], 'public');
     }
 
-    public function sendContact(): void {
+    public function sendContact(){
         if (!$this->isPost()) { $this->redirect('/contact'); return; }
         $this->validateCsrf();
 
@@ -38,12 +38,12 @@ class HomeController extends Controller {
         $this->redirect('/contact');
     }
 
-    public function unauthorized(): void {
+    public function unauthorized(){
         http_response_code(403);
         $this->view('errors/403', ['title' => 'Access Denied'], Auth::check() ? 'main' : 'public');
     }
 
-    public function marketPrices(): void {
+    public function marketPrices(){
         $priceModel = new MarketPriceModel();
         $cropModel  = new CropModel();
         $cropId     = (int) ($_GET['crop_id'] ?? 0);

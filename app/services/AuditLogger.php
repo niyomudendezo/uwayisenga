@@ -7,7 +7,7 @@ class AuditLogger {
         return self::$db;
     }
 
-    public static function log(string $action, string $module = '', int $recordId = 0, array $old = [], array $new = []): void {
+    public static function log($action, $module = '', $recordId = 0, $old = [], $new = []){
         try {
             $old = self::redactSensitive($old);
             $new = self::redactSensitive($new);
@@ -30,7 +30,7 @@ class AuditLogger {
         }
     }
 
-    private static function redactSensitive(array $values): array {
+    private static function redactSensitive($values): array {
         $sensitive = ['password', 'password_confirm', 'current_password', 'new_password', 'token', '_token', 'reset_token'];
         foreach ($values as $key => $value) {
             if (in_array(strtolower((string) $key), $sensitive, true)) {
@@ -42,7 +42,7 @@ class AuditLogger {
         return $values;
     }
 
-    public static function activity(string $description): void {
+    public static function activity($description){
         try {
             self::db()->prepare(
                 "INSERT INTO activity_logs (user_id, description, ip_address) VALUES (?,?,?)"

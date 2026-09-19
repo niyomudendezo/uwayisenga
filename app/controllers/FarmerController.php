@@ -2,7 +2,7 @@
 class FarmerController extends Controller {
 
     private FarmerModel $farmerModel;
-    private array $farmer;
+    private $farmer;
 
     public function __construct() {
         $this->requireRole('farmer');
@@ -12,7 +12,7 @@ class FarmerController extends Controller {
         $this->farmer = $farmer;
     }
 
-    public function dashboard(): void {
+    public function dashboard(){
         $farmerId  = $this->farmer['id'];
         $harvests  = $this->farmerModel->getHarvestHistory($farmerId);
         $topCrops  = $this->farmerModel->getTopCrops($farmerId);
@@ -31,7 +31,7 @@ class FarmerController extends Controller {
         ]);
     }
 
-    public function profile(): void {
+    public function profile(){
         $db = Database::getInstance();
         $this->view('farmer/profile', [
             'title'        => 'My Profile',
@@ -41,7 +41,7 @@ class FarmerController extends Controller {
         ]);
     }
 
-    public function updateProfile(): void {
+    public function updateProfile(){
         if (!$this->isPost()) { $this->redirect('/farmer/profile'); return; }
         $this->validateCsrf();
 
@@ -65,7 +65,7 @@ class FarmerController extends Controller {
         $this->redirect('/farmer/profile');
     }
 
-    public function harvests(): void {
+    public function harvests(){
         $model  = new HarvestModel();
         $page   = (int)($_GET['page'] ?? 1);
         $result = $model->getAllWithDetails($page, 15, '', $this->farmer['id']);
@@ -85,7 +85,7 @@ class FarmerController extends Controller {
         ]);
     }
 
-    public function storeHarvest(): void {
+    public function storeHarvest(){
         if (!$this->isPost()) { $this->redirect('/farmer/harvests'); return; }
         $this->validateCsrf();
         $data = [
@@ -104,7 +104,7 @@ class FarmerController extends Controller {
         $this->redirect('/farmer/harvests');
     }
 
-    public function marketPrices(): void {
+    public function marketPrices(){
         $priceModel = new MarketPriceModel();
         $cropModel  = new CropModel();
         $districtId = $this->farmer['district_id'] ?? 0;
@@ -116,7 +116,7 @@ class FarmerController extends Controller {
         ]);
     }
 
-    public function aiRecommendations(): void {
+    public function aiRecommendations(){
         $aiService  = new AIPredictionService();
         $topCrops   = $this->farmerModel->getTopCrops($this->farmer['id']);
         $predictions = [];
@@ -146,7 +146,7 @@ class FarmerController extends Controller {
         ]);
     }
 
-    public function salesHistory(): void {
+    public function salesHistory(){
         $db = Database::getInstance();
         $stmt = $db->prepare(
             "SELECT o.id, o.order_no, o.created_at, o.status, o.total_amount,
@@ -164,7 +164,7 @@ class FarmerController extends Controller {
         $this->view('farmer/sales-history', ['title' => 'Sales History', 'sales' => $stmt->fetchAll()]);
     }
 
-    public function saleDetail(string $id): void {
+    public function saleDetail($id){
         $db    = Database::getInstance();
         $stmt  = $db->prepare(
             "SELECT o.*, co.name as cooperative_name, b_user.first_name, b_user.last_name,

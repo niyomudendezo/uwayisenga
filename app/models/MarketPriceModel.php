@@ -1,8 +1,8 @@
 <?php
 class MarketPriceModel extends Model {
-    protected string $table = 'market_prices';
+    protected $table = 'market_prices';
 
-    public function getLatestPrices(int $districtId = 0, int $cropId = 0): array {
+    public function getLatestPrices($districtId = 0, $cropId = 0): array {
         $where = $districtId ? "AND mp.district_id=$districtId" : '';
         $cropWhere = $cropId ? "AND mp.crop_id=$cropId" : '';
         return $this->rawQuery(
@@ -15,7 +15,7 @@ class MarketPriceModel extends Model {
         );
     }
 
-    public function getPriceHistory(int $cropId, int $districtId = 0, int $months = 12): array {
+    public function getPriceHistory($cropId, $districtId = 0, $months = 12): array {
         $params = [$cropId];
         if ($districtId) {
             $where = "WHERE mp.crop_id=? AND mp.district_id=? AND mp.price_date >= DATE_SUB((SELECT MAX(price_date) FROM market_prices WHERE crop_id=?), INTERVAL ? MONTH)";
@@ -35,7 +35,7 @@ class MarketPriceModel extends Model {
         );
     }
 
-    public function getAllCropPriceHistory(int $districtId = 0, int $months = 12): array {
+    public function getAllCropPriceHistory($districtId = 0, $months = 12): array {
         $params = [];
         $districtWhere = '';
         if ($districtId) {
@@ -57,7 +57,7 @@ class MarketPriceModel extends Model {
         );
     }
 
-    public function getPriceTrends(int $cropId = 0): array {
+    public function getPriceTrends($cropId = 0): array {
         $cropWhere = $cropId ? "AND c.id=$cropId" : '';
         return $this->rawQuery(
             "SELECT c.name as crop_name, c.unit,
@@ -70,7 +70,7 @@ class MarketPriceModel extends Model {
         );
     }
 
-    public function getAllPaginated(int $page = 1, int $perPage = 15, int $cropId = 0, int $districtId = 0): array {
+    public function getAllPaginated($page = 1, $perPage = 15, $cropId = 0, $districtId = 0): array {
         $where = []; $params = [];
         if ($cropId)    { $where[] = "mp.crop_id=?"; $params[] = $cropId; }
         if ($districtId){ $where[] = "mp.district_id=?"; $params[] = $districtId; }

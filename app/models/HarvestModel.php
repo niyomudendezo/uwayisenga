@@ -1,8 +1,8 @@
 <?php
 class HarvestModel extends Model {
-    protected string $table = 'harvests';
+    protected $table = 'harvests';
 
-    public function getAllWithDetails(int $page = 1, int $perPage = 15, string $search = '', int $farmerId = 0, int $cooperativeId = 0): array {
+    public function getAllWithDetails($page = 1, $perPage = 15, $search = '', $farmerId = 0, $cooperativeId = 0): array {
         $where = []; $params = [];
         if ($search)       { $where[] = "(c.name LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ?)"; $params = array_merge($params, ["%$search%","%$search%","%$search%"]); }
         if ($farmerId)     { $where[] = "h.farmer_id=?"; $params[] = $farmerId; }

@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <rect width="1400" height="900" fill="#ffffff"/>
+  <g font-family="Arial, sans-serif">
+    <text x="700" y="70" text-anchor="middle" font-size="38" font-weight="700" fill="#19324d">Agile Software Development Model for AgruKrwanda</text>
+    <text x="700" y="108" text-anchor="middle" font-size="21" fill="#5d7185">Each iteration produces a tested system improvement and uses stakeholder feedback.</text>
+    <rect x="390" y="145" width="620" height="58" rx="29" fill="#edf4ee" stroke="#5b9668" stroke-width="2"/>
+    <text x="700" y="182" text-anchor="middle" font-size="22" font-weight="700" fill="#326341">Stakeholder needs, cooperative records and market information</text>
+    <path d="M700 205 V255" fill="none" stroke="#4e8560" stroke-width="5"/>
+    <path d="M689 242 L700 257 L711 242" fill="none" stroke="#4e8560" stroke-width="5"/>
+
+    <g>
+      <rect x="55" y="275" width="240" height="210" rx="18" fill="#eaf4e7"/>
+      <circle cx="100" cy="330" r="27" fill="#70ae4c"/><text x="100" y="339" text-anchor="middle" font-size="25" font-weight="700" fill="#fff">1</text>
+      <text x="175" y="335" text-anchor="middle" font-size="25" font-weight="700" fill="#31573a">Requirements</text>
+      <text x="175" y="368" text-anchor="middle" font-size="25" font-weight="700" fill="#31573a">Analysis</text>
+      <line x1="82" y1="400" x2="267" y2="400" stroke="#9fc6a3" stroke-width="2"/>
+      <text x="175" y="435" text-anchor="middle" font-size="18" fill="#365246">Identify users, needs</text><text x="175" y="463" text-anchor="middle" font-size="18" fill="#365246">and requirements</text>
+
+      <rect x="320" y="275" width="240" height="210" rx="18" fill="#e7f0fa"/>
+      <circle cx="365" cy="330" r="27" fill="#5899d1"/><text x="365" y="339" text-anchor="middle" font-size="25" font-weight="700" fill="#fff">2</text>
+      <text x="440" y="335" text-anchor="middle" font-size="25" font-weight="700" fill="#2e5f88">System</text><text x="440" y="368" text-anchor="middle" font-size="25" font-weight="700" fill="#2e5f88">Design</text>
+      <line x1="347" y1="400" x2="532" y2="400" stroke="#a4c4e2" stroke-width="2"/>
+      <text x="440" y="435" text-anchor="middle" font-size="18" fill="#36546c">Design database, MVC</text><text x="440" y="463" text-anchor="middle" font-size="18" fill="#36546c">and user interfaces</text>
+
+      <rect x="585" y="275" width="240" height="210" rx="18" fill="#fff4d8"/>
+      <circle cx="630" cy="330" r="27" fill="#e2ab16"/><text x="630" y="339" text-anchor="middle" font-size="25" font-weight="700" fill="#fff">3</text>
+      <text x="705" y="350" text-anchor="middle" font-size="25" font-weight="700" fill="#886600">Development</text>
+      <line x1="612" y1="400" x2="797" y2="400" stroke="#ebd17c" stroke-width="2"/>
+      <text x="705" y="435" text-anchor="middle" font-size="18" fill="#6a5720">Build modules and</text><text x="705" y="463" text-anchor="middle" font-size="18" fill="#6a5720">integrate AI features</text>
+
+      <rect x="850" y="275" width="240" height="210" rx="18" fill="#fff0e5"/>
+      <circle cx="895" cy="330" r="27" fill="#df7b2d"/><text x="895" y="339" text-anchor="middle" font-size="25" font-weight="700" fill="#fff">4</text>
+      <text x="970" y="350" text-anchor="middle" font-size="25" font-weight="700" fill="#a9561e">Testing</text>
+      <line x1="877" y1="400" x2="1062" y2="400" stroke="#f0bd94" stroke-width="2"/>
+      <text x="970" y="435" text-anchor="middle" font-size="18" fill="#71441f">Validate functionality,</text><text x="970" y="463" text-anchor="middle" font-size="18" fill="#71441f">security and usability</text>
+
+      <rect x="1115" y="275" width="240" height="210" rx="18" fill="#e9eef8"/>
+      <circle cx="1160" cy="330" r="27" fill="#5078b8"/><text x="1160" y="339" text-anchor="middle" font-size="25" font-weight="700" fill="#fff">5</text>
+      <text x="1235" y="335" text-anchor="middle" font-size="24" font-weight="700" fill="#355685">Deployment &amp;</text><text x="1235" y="368" text-anchor="middle" font-size="24" font-weight="700" fill="#355685">Review</text>
+      <line x1="1142" y1="400" x2="1327" y2="400" stroke="#aabce0" stroke-width="2"/>
+      <text x="1235" y="435" text-anchor="middle" font-size="18" fill="#3d5576">Release, document and</text><text x="1235" y="463" text-anchor="middle" font-size="18" fill="#3d5576">collect feedback</text>
+    </g>
+    <g fill="none" stroke="#718398" stroke-width="4"><path d="M297 380 H318"/><path d="M562 380 H583"/><path d="M827 380 H848"/><path d="M1092 380 H1113"/></g>
+    <g fill="#718398"><path d="M308 371 l12 9 -12 9z"/><path d="M573 371 l12 9 -12 9z"/><path d="M838 371 l12 9 -12 9z"/><path d="M1103 371 l12 9 -12 9z"/></g>
+    <path d="M1235 510 V605 Q1235 650 1190 650 H210 Q175 650 175 615 V520" fill="none" stroke="#4e8560" stroke-width="5" stroke-linecap="round"/>
+    <path d="M163 535 l12 -18 12 18" fill="none" stroke="#4e8560" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="430" y="615" width="540" height="72" rx="15" fill="#edf4ee"/>
+    <text x="700" y="646" text-anchor="middle" font-size="21" font-weight="700" fill="#326341">Stakeholder feedback drives the next iteration</text>
+    <text x="700" y="673" text-anchor="middle" font-size="17" fill="#526b5a">Refine requirements → improve the system → test again</text>
+    <rect x="310" y="750" width="780" height="62" rx="12" fill="#f5f7fa" stroke="#d5dee8" stroke-width="2"/>
+    <text x="700" y="789" text-anchor="middle" font-size="21" fill="#314b63">Result: A secure, role-based agricultural cooperative and market-linkage system</text>
+  </g>
+</svg>

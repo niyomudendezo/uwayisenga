@@ -5,7 +5,7 @@ class AdminController extends Controller {
         $this->requireRole('admin');
     }
 
-    public function dashboard(): void {
+    public function dashboard(){
         $db = Database::getInstance();
         $userModel  = new UserModel();
         $orderModel = new OrderModel();
@@ -35,7 +35,7 @@ class AdminController extends Controller {
         ));
     }
 
-    public function users(): void {
+    public function users(){
         $userModel = new UserModel();
         $page   = (int)($_GET['page'] ?? 1);
         $search = $_GET['search'] ?? '';
@@ -44,7 +44,7 @@ class AdminController extends Controller {
         $this->view('admin/users/index', ['title' => 'Users', 'result' => $result, 'search' => $search, 'role' => $role, 'roles' => $userModel->getRoles()]);
     }
 
-    public function createUser(): void {
+    public function createUser(){
         $userModel = new UserModel();
         $db = Database::getInstance();
         $this->view('admin/users/create', [
@@ -54,7 +54,7 @@ class AdminController extends Controller {
         ]);
     }
 
-    public function storeUser(): void {
+    public function storeUser(){
         if (!$this->isPost()) { $this->redirect('/admin/users'); return; }
         $this->validateCsrf();
 
@@ -89,7 +89,7 @@ class AdminController extends Controller {
         $this->redirect('/admin/users');
     }
 
-    public function editUser(string $id): void {
+    public function editUser($id){
         $userModel = new UserModel();
         $user = $userModel->findWithRole((int)$id);
         if (!$user) { $this->flash('danger', 'User not found.'); $this->redirect('/admin/users'); return; }
@@ -102,7 +102,7 @@ class AdminController extends Controller {
         ]);
     }
 
-    public function updateUser(string $id): void {
+    public function updateUser($id){
         if (!$this->isPost()) { $this->redirect('/admin/users'); return; }
         $this->validateCsrf();
 
@@ -127,7 +127,7 @@ class AdminController extends Controller {
         $this->redirect('/admin/users');
     }
 
-    public function deleteUser(string $id): void {
+    public function deleteUser($id){
         if (!$this->isPost()) { $this->redirect('/admin/users'); return; }
         $this->validateCsrf();
         if ((int)$id === Auth::id()) { $this->flash('danger', 'Cannot delete your own account.'); $this->redirect('/admin/users'); return; }
@@ -137,7 +137,7 @@ class AdminController extends Controller {
         $this->redirect('/admin/users');
     }
 
-    public function cooperatives(): void {
+    public function cooperatives(){
         $model  = new CooperativeModel();
         $page   = (int)($_GET['page'] ?? 1);
         $search = $_GET['search'] ?? '';
@@ -160,7 +160,7 @@ class AdminController extends Controller {
         ]);
     }
 
-    public function cooperativeMembers(string $id): void {
+    public function cooperativeMembers($id){
         $coopModel = new CooperativeModel();
         $coop      = $coopModel->findWithDetails((int)$id);
         if (!$coop) { $this->flash('danger', 'Cooperative not found.'); $this->redirect('/admin/cooperatives'); return; }
@@ -186,7 +186,7 @@ class AdminController extends Controller {
         ]);
     }
 
-    public function storeCooperative(): void {
+    public function storeCooperative(){
         if (!$this->isPost()) { $this->redirect('/admin/cooperatives'); return; }
         $this->validateCsrf();
         $data = [
@@ -206,7 +206,7 @@ class AdminController extends Controller {
         $this->redirect('/admin/cooperatives');
     }
 
-    public function farmers(): void {
+    public function farmers(){
         $model  = new FarmerModel();
         $page   = (int)($_GET['page'] ?? 1);
         $search = $_GET['search'] ?? '';
@@ -214,7 +214,7 @@ class AdminController extends Controller {
         $this->view('admin/farmers/index', ['title' => 'Farmers', 'result' => $result, 'search' => $search]);
     }
 
-    public function buyers(): void {
+    public function buyers(){
         $model    = new BuyerModel();
         $page     = (int)($_GET['page'] ?? 1);
         $search   = $_GET['search'] ?? '';
@@ -230,7 +230,7 @@ class AdminController extends Controller {
         ]);
     }
 
-    public function verifyBuyer(string $id): void {
+    public function verifyBuyer($id){
         if (!$this->isPost()) { $this->redirect('/admin/buyers'); return; }
         $this->validateCsrf();
         (new BuyerModel())->update((int)$id, ['verified' => 1, 'verified_at' => date('Y-m-d H:i:s')]);
@@ -239,7 +239,7 @@ class AdminController extends Controller {
         $this->redirect('/admin/buyers');
     }
 
-    public function crops(): void {
+    public function crops(){
         $cropModel = new CropModel();
         $page      = (int)($_GET['page'] ?? 1);
         $search    = $_GET['search'] ?? '';
@@ -254,7 +254,7 @@ class AdminController extends Controller {
         ]);
     }
 
-    public function storeCrop(): void {
+    public function storeCrop(){
         if (!$this->isPost()) { $this->redirect('/admin/crops'); return; }
         $this->validateCsrf();
         $data = [
@@ -272,7 +272,7 @@ class AdminController extends Controller {
         $this->redirect('/admin/crops');
     }
 
-    public function updateCrop(string $id): void {
+    public function updateCrop($id){
         if (!$this->isPost()) { $this->redirect('/admin/crops'); return; }
         $this->validateCsrf();
         $data = [
@@ -289,7 +289,7 @@ class AdminController extends Controller {
         $this->redirect('/admin/crops');
     }
 
-    public function marketPrices(): void {
+    public function marketPrices(){
         $model  = new MarketPriceModel();
         $page   = (int)($_GET['page'] ?? 1);
         $cropId = (int)($_GET['crop'] ?? 0);
@@ -311,7 +311,7 @@ class AdminController extends Controller {
         ]);
     }
 
-    public function storePrice(): void {
+    public function storePrice(){
         if (!$this->isPost()) { $this->redirect('/admin/market-prices'); return; }
         $this->validateCsrf();
         $data = [
@@ -329,7 +329,7 @@ class AdminController extends Controller {
         $this->redirect('/admin/market-prices');
     }
 
-    public function orders(): void {
+    public function orders(){
         $model  = new OrderModel();
         $page   = (int)($_GET['page'] ?? 1);
         $search = $_GET['search'] ?? '';
@@ -338,7 +338,7 @@ class AdminController extends Controller {
         $this->view('admin/orders/index', ['title' => 'Orders', 'result' => $result, 'search' => $search, 'status' => $status]);
     }
 
-    public function reports(): void {
+    public function reports(){
         $db = Database::getInstance();
         $this->view('admin/reports/index', [
             'title'        => 'Reports',
@@ -348,7 +348,7 @@ class AdminController extends Controller {
         ]);
     }
 
-    private function renderReport(string $title, array $columns, array $rows, string $format): void {
+    private function renderReport($title, $columns, $rows, $format){
         if (in_array($format, ['csv', 'excel'], true)) {
             header('Content-Type: text/csv; charset=utf-8');
             header('Content-Disposition: attachment; filename="' . strtolower(str_replace(' ', '_', $title)) . '_' . date('Y-m-d') . '.csv"');
@@ -378,7 +378,7 @@ class AdminController extends Controller {
         exit;
     }
 
-    public function reportFarmers(): void {
+    public function reportFarmers(){
         $format = $_GET['format'] ?? 'pdf';
         $db = Database::getInstance();
         $rows = $db->query(
@@ -393,7 +393,7 @@ class AdminController extends Controller {
         $this->renderReport('Farmers Report', ['First Name','Last Name','Email','Phone','Farm Name','Farm Size (ha)','District','Cooperative','Soil Type','Irrigation','Status','Registered'], $rows, $format);
     }
 
-    public function reportCooperatives(): void {
+    public function reportCooperatives(){
         $format = $_GET['format'] ?? 'pdf';
         $db = Database::getInstance();
         $rows = $db->query(
@@ -409,7 +409,7 @@ class AdminController extends Controller {
         $this->renderReport('Cooperatives Report', ['Name','Reg No','District','Phone','Email','Status','Members','Inventory (kg)'], $rows, $format);
     }
 
-    public function reportPrices(): void {
+    public function reportPrices(){
         $format = $_GET['format'] ?? 'pdf';
         $rows = (new MarketPriceModel())->getAllPaginated(1, 10000)['data'];
         $out = array_map(fn($r) => [
@@ -419,7 +419,7 @@ class AdminController extends Controller {
         $this->renderReport('Market Prices Report', ['Crop','Price (RWF)','Unit','District','Date','Source'], $out, $format);
     }
 
-    public function reportOrders(): void {
+    public function reportOrders(){
         $format = $_GET['format'] ?? 'pdf';
         $rows = (new OrderModel())->getAllWithDetails(1, 10000)['data'];
         $out = array_map(fn($r) => [
@@ -431,7 +431,7 @@ class AdminController extends Controller {
         $this->renderReport('Orders Report', ['Order No','Buyer','Cooperative','Amount (RWF)','Status','Date'], $out, $format);
     }
 
-    public function reportInventory(): void {
+    public function reportInventory(){
         $format = $_GET['format'] ?? 'pdf';
         $rows = (new InventoryModel())->getAllWithDetails(1, 10000)['data'];
         $out = array_map(fn($r) => [
@@ -442,7 +442,7 @@ class AdminController extends Controller {
         $this->renderReport('Inventory Report', ['Crop','Cooperative','Warehouse','Available','Reserved','Sold','Grade','Price (RWF)','Status'], $out, $format);
     }
 
-    public function reportAi(): void {
+    public function reportAi(){
         $format = $_GET['format'] ?? 'pdf';
         $rows = (new AIPredictionService())->getLatestPredictions(10000);
         $out = array_map(fn($r) => [
@@ -453,7 +453,7 @@ class AdminController extends Controller {
         $this->renderReport('AI Predictions Report', ['Crop','District','Demand','Predicted Price (RWF)','Confidence','Best Period','Date'], $out, $format);
     }
 
-    public function auditLogs(): void {
+    public function auditLogs(){
         $db     = Database::getInstance();
         $page   = (int)($_GET['page'] ?? 1);
         $perPage = 20;
@@ -470,7 +470,7 @@ class AdminController extends Controller {
         ]);
     }
 
-    public function settings(): void {
+    public function settings(){
         $db = Database::getInstance();
         $settings = [];
         foreach ($db->query("SELECT key_name, value FROM settings")->fetchAll() as $s) {
@@ -479,7 +479,7 @@ class AdminController extends Controller {
         $this->view('admin/settings', ['title' => 'Settings', 'settings' => $settings]);
     }
 
-    public function saveSettings(): void {
+    public function saveSettings(){
         if (!$this->isPost()) { $this->redirect('/admin/settings'); return; }
         $this->validateCsrf();
         $db = Database::getInstance();
@@ -492,7 +492,7 @@ class AdminController extends Controller {
         $this->redirect('/admin/settings');
     }
 
-    public function inventory(): void {
+    public function inventory(){
         $model  = new InventoryModel();
         $page   = (int)($_GET['page'] ?? 1);
         $search = $_GET['search'] ?? '';
@@ -513,7 +513,7 @@ class AdminController extends Controller {
         ]);
     }
 
-    public function aiPredictions(): void {
+    public function aiPredictions(){
         $aiService = new AIPredictionService();
         $db        = Database::getInstance();
         $crops     = (new CropModel())->getAllWithCategory();
@@ -531,7 +531,7 @@ class AdminController extends Controller {
         ]);
     }
 
-    public function runPrediction(): void {
+    public function runPrediction(){
         if (!$this->isPost()) { $this->redirect('/admin/ai-predictions'); return; }
         $this->validateCsrf();
         $cropId     = (int)($_POST['crop_id'] ?? 0);
@@ -551,7 +551,7 @@ class AdminController extends Controller {
     }
 
     // ── WAREHOUSES ────────────────────────────────────────────────────────────
-    public function warehouses(): void {
+    public function warehouses(){
         $model  = new WarehouseModel();
         $search = $_GET['search'] ?? '';
         $status = $_GET['status'] ?? '';
@@ -566,7 +566,7 @@ class AdminController extends Controller {
         ]);
     }
 
-    public function createWarehouse(): void {
+    public function createWarehouse(){
         $this->view('admin/warehouses/create', [
             'title'        => 'Add Warehouse',
             'cooperatives' => Database::getInstance()->query("SELECT id,name FROM cooperatives WHERE status='active' ORDER BY name")->fetchAll(),
@@ -574,7 +574,7 @@ class AdminController extends Controller {
         ]);
     }
 
-    public function storeWarehouse(): void {
+    public function storeWarehouse(){
         if (!$this->isPost()) { $this->redirect('/admin/warehouses'); return; }
         $this->validateCsrf();
         $id = (new WarehouseModel())->create($_POST);
@@ -583,7 +583,7 @@ class AdminController extends Controller {
         $this->redirect('/admin/warehouses');
     }
 
-    public function editWarehouse(string $id): void {
+    public function editWarehouse($id){
         $model = new WarehouseModel();
         $warehouse = $model->getById((int)$id);
         if (!$warehouse) { $this->redirect('/admin/warehouses'); return; }
@@ -595,7 +595,7 @@ class AdminController extends Controller {
         ]);
     }
 
-    public function updateWarehouse(string $id): void {
+    public function updateWarehouse($id){
         if (!$this->isPost()) { $this->redirect('/admin/warehouses'); return; }
         $this->validateCsrf();
         (new WarehouseModel())->update((int)$id, $_POST);
@@ -604,7 +604,7 @@ class AdminController extends Controller {
         $this->redirect('/admin/warehouses');
     }
 
-    public function deleteWarehouse(string $id): void {
+    public function deleteWarehouse($id){
         if (!$this->isPost()) { $this->redirect('/admin/warehouses'); return; }
         $this->validateCsrf();
         (new WarehouseModel())->delete((int)$id);
@@ -613,7 +613,7 @@ class AdminController extends Controller {
         $this->redirect('/admin/warehouses');
     }
 
-    public function warehouseDetail(string $id): void {
+    public function warehouseDetail($id){
         $model = new WarehouseModel();
         $warehouse = $model->getById((int)$id);
         if (!$warehouse) { $this->redirect('/admin/warehouses'); return; }

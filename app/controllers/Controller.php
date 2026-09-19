@@ -1,6 +1,6 @@
 <?php
 abstract class Controller {
-    protected function view(string $view, array $data = [], string $layout = 'main'): void {
+    protected function view($view, $data = [], $layout = 'main'){
         extract($data);
         $viewFile = BASE_PATH . '/app/views/' . $view . '.php';
         if (!file_exists($viewFile)) {
@@ -14,19 +14,19 @@ abstract class Controller {
         }
     }
 
-    protected function json(mixed $data, int $code = 200): void {
+    protected function json(mixed $data, $code = 200){
         http_response_code($code);
         header('Content-Type: application/json');
         echo json_encode($data);
         exit;
     }
 
-    protected function redirect(string $url): void {
+    protected function redirect($url){
         header("Location: " . APP_URL . $url);
         exit;
     }
 
-    protected function back(): void {
+    protected function back(){
         $ref = $_SERVER['HTTP_REFERER'] ?? APP_URL . '/';
         header("Location: {$ref}");
         exit;
@@ -36,29 +36,29 @@ abstract class Controller {
     protected function isGet(): bool  { return $_SERVER['REQUEST_METHOD'] === 'GET'; }
     protected function isAjax(): bool { return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'; }
 
-    protected function input(string $key, mixed $default = null): mixed {
+    protected function input($key, mixed $default = null): mixed {
         return $_POST[$key] ?? $_GET[$key] ?? $default;
     }
 
-    protected function sanitize(string $value): string {
+    protected function sanitize($value): string {
         return htmlspecialchars(trim($value), ENT_QUOTES, 'UTF-8');
     }
 
-    protected function validateCsrf(): void {
+    protected function validateCsrf(){
         $token = $_POST['_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
         if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
             $this->json(['error' => 'Invalid CSRF token'], 403);
         }
     }
 
-    protected function requireAuth(): void {
+    protected function requireAuth(){
         if (empty($_SESSION['user_id'])) {
             if ($this->isAjax()) $this->json(['error' => 'Unauthenticated'], 401);
             $this->redirect('/login');
         }
     }
 
-    protected function requireRole(string ...$roles): void {
+    protected function requireRole(string ...$roles){
         $this->requireAuth();
         if (!in_array($_SESSION['role'] ?? '', $roles)) {
             if ($this->isAjax()) $this->json(['error' => 'Forbidden'], 403);
@@ -66,11 +66,11 @@ abstract class Controller {
         }
     }
 
-    protected function flash(string $type, string $message): void {
+    protected function flash($type, $message){
         $_SESSION['flash'] = ['type' => $type, 'message' => $message];
     }
 
-    protected function setFlash(string $type, string $msg): void {
+    protected function setFlash($type, $msg){
         $_SESSION['flash'] = ['type' => $type, 'message' => $msg];
     }
 }

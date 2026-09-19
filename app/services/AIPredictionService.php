@@ -6,8 +6,8 @@
  */
 class AIPredictionService {
     private PDO $db;
-    private string $aiServiceUrl;
-    private bool $useExternalAI;
+    private $aiServiceUrl;
+    private $useExternalAI;
 
     public function __construct() {
         $this->db            = Database::getInstance();
@@ -15,7 +15,7 @@ class AIPredictionService {
         $this->useExternalAI = (bool) $this->getSetting('ai_enabled', '0');
     }
 
-    private function getSetting(string $key, string $default = ''): string {
+    private function getSetting($key, $default = ''): string {
         $stmt = $this->db->prepare("SELECT value FROM settings WHERE key_name=?");
         $stmt->execute([$key]);
         return $stmt->fetchColumn() ?: $default;
@@ -24,7 +24,7 @@ class AIPredictionService {
     /**
      * Generate prediction for a crop in a district
      */
-    public function predict(int $cropId, int $districtId, int $cooperativeId = 0): array {
+    public function predict($cropId, $districtId, $cooperativeId = 0): array {
         if ($this->useExternalAI) {
             $result = $this->callExternalAI($cropId, $districtId);
             if ($result) return $result;
@@ -35,7 +35,7 @@ class AIPredictionService {
     /**
      * Local statistical prediction engine
      */
-    private function localPredict(int $cropId, int $districtId, int $cooperativeId): array {
+    private function localPredict($cropId, $districtId, $cooperativeId): array {
         $prices    = $this->getHistoricalPrices($cropId, $districtId);
         $sales     = $this->getSalesHistory($cropId, $cooperativeId);
         $inventory = $this->getInventoryLevel($cropId, $cooperativeId);
@@ -90,7 +90,7 @@ class AIPredictionService {
         return $result;
     }
 
-    private function getHistoricalPrices(int $cropId, int $districtId): array {
+    private function getHistoricalPrices($cropId, $districtId): array {
         if ($districtId) {
             $stmt = $this->db->prepare(
                 "SELECT AVG(price) AS price, price_date FROM market_prices
@@ -135,7 +135,7 @@ class AIPredictionService {
         return array_slice($combined, 0, 24);
     }
 
-    public function getPredictionEvidence(int $cropId, int $districtId = 0): array {
+    public function getPredictionEvidence($cropId, $districtId = 0): array {
         $marketSql = "SELECT COUNT(*) FROM market_prices WHERE crop_id=?";
         $marketParams = [$cropId];
         if ($districtId) {
@@ -158,7 +158,7 @@ class AIPredictionService {
         return ['prices' => (int)$stmt->fetchColumn(), 'sales' => (int)$salesStmt->fetchColumn()];
     }
 
-    private function getSalesHistory(int $cropId, int $cooperativeId): array {
+    private function getSalesHistory($cropId, $cooperativeId): array {
         $sql = "SELECT oi.quantity, oi.unit_price, o.created_at
                 FROM order_items oi
                 JOIN orders o ON oi.order_id=o.id
@@ -171,7 +171,7 @@ class AIPredictionService {
         return $stmt->fetchAll();
     }
 
-    private function getInventoryLevel(int $cropId, int $cooperativeId): float {
+    private function getInventoryLevel($cropId, $cooperativeId): float {
         $sql = "SELECT COALESCE(SUM(qty_available),0) FROM inventories WHERE crop_id=? AND status='available'";
         $params = [$cropId];
         if ($cooperativeId) { $sql .= " AND cooperative_id=?"; $params[] = $cooperativeId; }
@@ -180,7 +180,7 @@ class AIPredictionService {
         return (float) $stmt->fetchColumn();
     }
 
-    private function findBestBuyer(int $cropId, int $districtId): array {
+    private function findBestBuyer($cropId, $districtId): array {
         // Find buyer with highest offer or most purchase history
         $stmt = $this->db->prepare(
             "SELECT b.id, b.company_name, u.first_name, u.last_name,
@@ -207,7 +207,7 @@ class AIPredictionService {
     /**
      * Simple linear regression on price time series
      */
-    private function linearRegression(array $prices): float {
+    private function linearRegression($prices): float {
         if (empty($prices)) return 0;
         if (count($prices) === 1) return (float) $prices[0]['price'];
 
@@ -232,7 +232,7 @@ class AIPredictionService {
         return max(0, $intercept + $slope * ($n + 1));
     }
 
-    private function classifyDemand(array $prices, array $sales): string {
+    private function classifyDemand($prices, $sales): string {
         if (empty($prices)) return 'Medium';
 
         $recentPrices = array_slice($prices, 0, 3);
@@ -250,14 +250,14 @@ class AIPredictionService {
         return 'Medium';
     }
 
-    private function calculateConfidence(int $priceCount, int $salesCount): float {
+    private function calculateConfidence($priceCount, $salesCount): float {
         if ($priceCount === 0 && $salesCount === 0) return 0.0;
         $priceCoverage = min(1, $priceCount / 24);
         $salesCoverage = min(1, $salesCount / 20);
         return round(min(95, ($priceCoverage * 70) + ($salesCoverage * 25)), 1);
     }
 
-    private function getBestSellingPeriod(array $prices): string {
+    private function getBestSellingPeriod($prices): string {
         if (count($prices) < 2) return 'Immediate';
 
         $latest = (float) ($prices[0]['price'] ?? 0);
@@ -268,13 +268,13 @@ class AIPredictionService {
         return 'Next 3-7 days';
     }
 
-    private function suggestQuantity(array $sales, float $inventory): float {
+    private function suggestQuantity($sales, $inventory): float {
         if (empty($sales)) return $inventory * 0.5;
         $avgSale = array_sum(array_column($sales, 'quantity')) / count($sales);
         return min($inventory, $avgSale * 1.2);
     }
 
-    private function buildRecommendation(string $demand, float $predicted, float $latest, string $period, array $buyer): string {
+    private function buildRecommendation($demand, $predicted, $latest, $period, $buyer): string {
         $buyerName = $buyer['company_name'] ?? 'local market';
         $priceDiff = $predicted - $latest;
         $direction = $priceDiff >= 0 ? 'increase' : 'decrease';
@@ -287,7 +287,7 @@ class AIPredictionService {
         return $text;
     }
 
-    private function savePrediction(array $data): void {
+    private function savePrediction($data){
         try {
             $this->db->prepare(
                 "INSERT INTO ai_predictions
@@ -305,7 +305,7 @@ class AIPredictionService {
         } catch (Exception $e) {}
     }
 
-    private function callExternalAI(int $cropId, int $districtId): ?array {
+    private function callExternalAI($cropId, $districtId): ?array {
         $url = $this->aiServiceUrl . '/predict';
         $payload = json_encode(['crop_id' => $cropId, 'district_id' => $districtId]);
 
@@ -320,7 +320,7 @@ class AIPredictionService {
         return $response ? json_decode($response, true) : null;
     }
 
-    public function getLatestPredictions(int $limit = 10): array {
+    public function getLatestPredictions($limit = 10): array {
         $stmt = $this->db->prepare(
             "SELECT ap.*, c.name as crop_name, c.unit, d.name as district_name,
                     co.name as cooperative_name,
