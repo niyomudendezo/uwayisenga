@@ -1,7 +1,11 @@
 <?php
 define('APP_NAME',    'AgruKrwanda');
 define('APP_VERSION', '1.0.0');
-define('APP_URL',     'http://localhost/agrukrwanda');
+$_appScheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
+$_appHost   = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$_appFolder = trim(str_replace($_SERVER['DOCUMENT_ROOT'] ?? '', '', dirname(dirname(__FILE__))), '/');
+define('APP_URL', $_appScheme . '://' . $_appHost . '/' . $_appFolder);
+unset($_appScheme, $_appHost, $_appFolder);
 define('BASE_PATH',   dirname(__DIR__));
 define('PUBLIC_PATH', BASE_PATH . '/public');
 define('UPLOAD_PATH', PUBLIC_PATH . '/assets/uploads');

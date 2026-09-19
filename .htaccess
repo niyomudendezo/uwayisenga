@@ -1,6 +1,8 @@
+DirectoryIndex index.php
 Options -Indexes
-RewriteEngine On
 
-# Redirect to public/index.php, preserving the URI
-RewriteCond %{REQUEST_URI} !^/agrukrwanda/public/
-RewriteRule ^(.*)$ public/$1 [L,QSA]
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} !^/agrukrwanda/public/
+    RewriteRule ^(.*)$ public/$1 [L,QSA]
+</IfModule>

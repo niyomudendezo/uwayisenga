@@ -2,13 +2,13 @@
 class UserModel extends Model {
     protected $table = 'users';
 
-    public function findByEmail($email): array|false {
+    public function findByEmail($email) {
         $stmt = $this->db->prepare("SELECT u.*, r.name as role_name FROM users u JOIN roles r ON u.role_id=r.id WHERE u.email=?");
         $stmt->execute([$email]);
         return $stmt->fetch();
     }
 
-    public function findWithRole($id): array|false {
+    public function findWithRole($id) {
         $stmt = $this->db->prepare("SELECT u.*, r.name as role_name FROM users u JOIN roles r ON u.role_id=r.id WHERE u.id=?");
         $stmt->execute([$id]);
         return $stmt->fetch();
@@ -36,7 +36,7 @@ class UserModel extends Model {
         return $this->db->prepare("UPDATE users SET reset_token=?, reset_token_expires=DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE email=?")->execute([$token, $email]);
     }
 
-    public function findByResetToken($token): array|false {
+    public function findByResetToken($token) {
         $stmt = $this->db->prepare("SELECT * FROM users WHERE reset_token=? AND reset_token_expires > NOW()");
         $stmt->execute([$token]);
         return $stmt->fetch();

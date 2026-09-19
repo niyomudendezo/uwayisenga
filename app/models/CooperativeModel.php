@@ -23,7 +23,7 @@ class CooperativeModel extends Model {
         return ['data' => $stmt->fetchAll(), 'total' => $total, 'per_page' => $perPage, 'current_page' => $page, 'last_page' => max(1,(int)ceil($total/$perPage))];
     }
 
-    public function findWithDetails($id): array|false {
+    public function findWithDetails($id) {
         $stmt = $this->db->prepare(
             "SELECT c.*, d.name as district_name, u.first_name, u.last_name, u.email as manager_email
              FROM cooperatives c
@@ -65,7 +65,7 @@ class CooperativeModel extends Model {
         return $stmt->fetchAll();
     }
 
-    public function getByManagerId($userId): array|false {
+    public function getByManagerId($userId) {
         $stmt = $this->db->prepare("SELECT * FROM cooperatives WHERE manager_id=? LIMIT 1");
         $stmt->execute([$userId]);
         return $stmt->fetch();

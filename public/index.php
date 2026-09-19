@@ -13,9 +13,11 @@ require_once BASE_PATH . '/routes/Router.php';
 $router = new Router();
 require_once BASE_PATH . '/routes/web.php';
 
-$uri       = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$base      = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/');
-if ($base !== '') {
+$uri  = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$base = rtrim(str_replace('\\', '/', dirname(dirname(__FILE__))), '/');
+$base = str_replace($_SERVER['DOCUMENT_ROOT'], '', $base);
+$base = rtrim($base, '/');
+if ($base !== '' && strpos($uri, $base) === 0) {
     $uri = substr($uri, strlen($base));
 }
 $uri = '/' . ltrim($uri, '/');

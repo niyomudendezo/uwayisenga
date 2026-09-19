@@ -43,7 +43,7 @@
             <td><?= Helper::statusBadge($o['status']) ?></td>
             <td class="small text-muted"><?= Helper::timeAgo($o['created_at']) ?></td>
             <td>
-              <?php $base = str_contains($_SERVER['REQUEST_URI'], '/admin') ? '/admin' : '/cooperative'; ?>
+              <?php $base = (strpos($_SERVER['REQUEST_URI'], '/admin') !== false) ? '/admin' : '/cooperative'; ?>
               <a href="<?= APP_URL . $base ?>/orders/<?= $o['id'] ?>" class="btn btn-xs btn-outline-success">View</a>
             </td>
           </tr>
