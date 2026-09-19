@@ -39,7 +39,7 @@ class Helper {
         return 'ORD-' . date('Y') . '-' . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
     }
 
-    public static function uploadFile($file, $dir, $allowed = ['jpg','jpeg','png','pdf']): string|false {
+    public static function uploadFile($file, $dir, $allowed = ['jpg','jpeg','png','pdf']) {
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         if (!in_array($ext, $allowed)) return false;
         if ($file['size'] > 5 * 1024 * 1024) return false;
@@ -62,7 +62,7 @@ class Helper {
 
         if ($last <= 1) return '';
 
-        $separator = str_contains($baseUrl, '?') ? '&' : '?';
+        $separator = (strpos($baseUrl, '?') !== false) ? '&' : '?';
 
         $html = '<nav><ul class="pagination pagination-sm mb-0">';
         $html .= '<li class="page-item' . ($current <= 1 ? ' disabled' : '') . '">';
@@ -83,7 +83,7 @@ class Helper {
         return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
     }
 
-    public static function flash(): ?array {
+    public static function flash() {
         $flash = $_SESSION['flash'] ?? null;
         unset($_SESSION['flash']);
         return $flash;

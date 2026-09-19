@@ -2,7 +2,7 @@
 class BuyerModel extends Model {
     protected $table = 'buyers';
 
-    public function getAllWithDetails($page = 1, $perPage = 15, $search = '', ?string $verified = null): array {
+    public function getAllWithDetails($page = 1, $perPage = 15, $search = '', $verified = null): array {
         $where = []; $params = [];
         if ($search)            { $where[] = "(u.first_name LIKE ? OR u.last_name LIKE ? OR b.company_name LIKE ? OR u.email LIKE ?)"; $params = ["%$search%","%$search%","%$search%","%$search%"]; }
         if ($verified !== null) { $where[] = "b.verified=?"; $params[] = (int)$verified; }
@@ -24,7 +24,7 @@ class BuyerModel extends Model {
         return ['data' => $stmt->fetchAll(), 'total' => $total, 'per_page' => $perPage, 'current_page' => $page, 'last_page' => max(1,(int)ceil($total/$perPage))];
     }
 
-    public function findByUserId($userId): array|false {
+    public function findByUserId($userId) {
         $stmt = $this->db->prepare(
             "SELECT b.*, u.first_name, u.last_name, u.email, u.phone, u.avatar, u.status,
                     d.name as district_name

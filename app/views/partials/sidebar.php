@@ -74,7 +74,7 @@
 
     <li class="sidebar-section-label"><span>Management</span></li>
     <?php foreach ($navItems as [$path, $icon, $label]): ?>
-      <?php $active = str_starts_with($uri, dirname($_SERVER['SCRIPT_NAME']) . $path) ? 'active' : ''; ?>
+      <?php $active = (strpos($uri, dirname($_SERVER['SCRIPT_NAME']) . $path) === 0) ? 'active' : ''; ?>
       <li class="nav-item">
         <a href="<?= APP_URL . $path ?>" class="nav-link text-white <?= $active ?>">
           <i class="bi <?= $icon ?>"></i><span><?= $label ?></span>

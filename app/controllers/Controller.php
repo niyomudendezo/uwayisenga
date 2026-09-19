@@ -14,7 +14,7 @@ abstract class Controller {
         }
     }
 
-    protected function json(mixed $data, $code = 200){
+    protected function json($data, $code = 200){
         http_response_code($code);
         header('Content-Type: application/json');
         echo json_encode($data);
@@ -36,7 +36,7 @@ abstract class Controller {
     protected function isGet(): bool  { return $_SERVER['REQUEST_METHOD'] === 'GET'; }
     protected function isAjax(): bool { return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'; }
 
-    protected function input($key, mixed $default = null): mixed {
+    protected function input($key, $default = null) {
         return $_POST[$key] ?? $_GET[$key] ?? $default;
     }
 

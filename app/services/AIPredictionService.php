@@ -305,7 +305,7 @@ class AIPredictionService {
         } catch (Exception $e) {}
     }
 
-    private function callExternalAI($cropId, $districtId): ?array {
+    private function callExternalAI($cropId, $districtId) {
         $url = $this->aiServiceUrl . '/predict';
         $payload = json_encode(['crop_id' => $cropId, 'district_id' => $districtId]);
 
